@@ -40,7 +40,7 @@ func newBatch(w http.ResponseWriter, r *http.Request) {
     decodeErr := decoder.Decode(&batchRequest)
     
     if decodeErr != nil {
-        fmt.Fprintln(w, "Unable to decode request payload.  Error: " + decodeErr.Error())
+        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to decode request payload.  Error: " + decodeErr.Error() + "\"}")
         os.Exit(1)
     }
     
@@ -49,7 +49,7 @@ func newBatch(w http.ResponseWriter, r *http.Request) {
     bigQueryClient, bigQueryClientErr := bigquery.NewClient(ctx, "beer-gravity-tracker")
     
     if bigQueryClientErr != nil {
-        fmt.Fprintln(w, "Unable to connect to datastore.  Cannot continue")
+        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to connect to datastore.  Error: " + bigQueryClientErr.Error() + "\"}")
         os.Exit(1)
     }
     
@@ -60,7 +60,7 @@ func newBatch(w http.ResponseWriter, r *http.Request) {
     it, readErr := query.Read(ctx)
     
     if readErr != nil {
-       fmt.Fprintln(w, "Unable to read query.  Cannot continue")
+       fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to read query.  Error: " + readErr.Error() + "\"}")
        os.Exit(1)
     } 
     
@@ -69,7 +69,7 @@ func newBatch(w http.ResponseWriter, r *http.Request) {
     itErr := it.Next(&lastBatchId)
     
     if itErr != nil && itErr != iterator.Done {
-        fmt.Fprintln(w, "Unable to get query output.  Cannot continue")
+        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to get query output.  Error: " + itErr.Error() + "\"}")
         os.Exit(1)
     }
     
