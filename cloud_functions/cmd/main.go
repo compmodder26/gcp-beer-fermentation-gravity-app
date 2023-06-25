@@ -5,7 +5,7 @@ import (
     "os"
     
     // Blank-import the function package so the init() runs
-	_ "compmodder26/gcp-beer-fermentation-gravity-app-cloud-functions"
+	_ "github.com/compmodder26/gcp-beer-fermentation-gravity-app/cloud_functions"
 	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
 )
 
