@@ -5,7 +5,6 @@ import (
     "encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"google.golang.org/api/iterator"
@@ -41,7 +40,7 @@ func newBatch(w http.ResponseWriter, r *http.Request) {
     
     if decodeErr != nil {
         fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to decode request payload.  Error: " + decodeErr.Error() + "\"}")
-        os.Exit(1)
+        return
     }
     
     ctx := context.Background()
@@ -50,7 +49,7 @@ func newBatch(w http.ResponseWriter, r *http.Request) {
     
     if bigQueryClientErr != nil {
         fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to connect to datastore.  Error: " + bigQueryClientErr.Error() + "\"}")
-        os.Exit(1)
+        return
     }
     
     defer bigQueryClient.Close()
@@ -61,7 +60,7 @@ func newBatch(w http.ResponseWriter, r *http.Request) {
     
     if readErr != nil {
        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to read query.  Error: " + readErr.Error() + "\"}")
-       os.Exit(1)
+       return
     } 
     
     var lastBatchId LatestBatchId
@@ -70,7 +69,7 @@ func newBatch(w http.ResponseWriter, r *http.Request) {
     
     if itErr != nil && itErr != iterator.Done {
         fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to get query output.  Error: " + itErr.Error() + "\"}")
-        os.Exit(1)
+        return
     }
     
     newBatchId := lastBatchId.Id + 1

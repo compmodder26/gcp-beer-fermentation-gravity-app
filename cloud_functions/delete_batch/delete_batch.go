@@ -5,7 +5,6 @@ import (
     "encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"cloud.google.com/go/bigquery"
@@ -29,7 +28,7 @@ func deleteBatch(w http.ResponseWriter, r *http.Request) {
     
     if decodeErr != nil {
         fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to decode request payload.  Error: " + decodeErr.Error() + "\"}")
-        os.Exit(1)
+        return
     }
     
     ctx := context.Background()
@@ -38,7 +37,7 @@ func deleteBatch(w http.ResponseWriter, r *http.Request) {
     
     if bigQueryClientErr != nil {
         fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to connect to datastore.  Error: " + bigQueryClientErr.Error() + "\"}")
-        os.Exit(1)
+        return
     }
     
     defer bigQueryClient.Close()
@@ -50,7 +49,7 @@ func deleteBatch(w http.ResponseWriter, r *http.Request) {
     
     if _, delReadingErr := delReadingQuery.Read(ctx); delReadingErr != nil {
         fmt.Fprintln(w, "{\"success\":false, \"error\":\"" + delReadingErr.Error() + "\"}")
-        os.Exit(1)
+        return
     } 
     
     delBatchQuery := bigQueryClient.Query("DELETE FROM beer-gravity-tracker.data.batches WHERE id = @id")

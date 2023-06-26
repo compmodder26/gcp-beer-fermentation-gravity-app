@@ -5,7 +5,6 @@ import (
     "encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"cloud.google.com/go/bigquery"
@@ -31,7 +30,7 @@ func updateBatch(w http.ResponseWriter, r *http.Request) {
     
     if decodeErr != nil {
         fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to decode request payload.  Error: " + decodeErr.Error() + "\"}")
-        os.Exit(1)
+        return
     }
     
     ctx := context.Background()
@@ -40,7 +39,7 @@ func updateBatch(w http.ResponseWriter, r *http.Request) {
     
     if bigQueryClientErr != nil {
         fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to connect to datastore.  Error: " + bigQueryClientErr.Error() + "\"}")
-        os.Exit(1)
+        return
     }
     
     defer bigQueryClient.Close()

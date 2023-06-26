@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"google.golang.org/api/iterator"
@@ -29,7 +28,7 @@ func listBatches(w http.ResponseWriter, r *http.Request) {
     
     if bigQueryClientErr != nil {
         fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to connect to datastore.  Cannot continue.  Error: " + bigQueryClientErr.Error() + "\"}")
-        os.Exit(1)
+        return
     }
      
     query := bigQueryClient.Query(`SELECT id, name, target_gravity FROM beer-gravity-tracker.data.batches ORDER BY name ASC`)
@@ -38,7 +37,7 @@ func listBatches(w http.ResponseWriter, r *http.Request) {
         
     if readErr != nil {
        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to read query.  Cannot continue. Error: " + readErr.Error() + "\"}")
-       os.Exit(1)
+       return
     } 
     
     batches := make([]Batch, 0)
@@ -54,7 +53,7 @@ func listBatches(w http.ResponseWriter, r *http.Request) {
         
         if itErr != nil {
             fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to get query output.  Cannot continue.  Error: " + itErr.Error() + "\"}")
-            os.Exit(1)
+            return
         }
         
         batches = append(batches, batch)
