@@ -1,4 +1,4 @@
-package list_batches
+package get_batch
 
 import (
     "context"
@@ -12,6 +12,10 @@ import (
 	"cloud.google.com/go/bigquery"
 )
 
+type BatchRequest struct {
+    Id int `json:"id"`
+}
+
 type Batch struct {
     Id int `json:"id"`
     Name string `json:"name"`
@@ -19,10 +23,22 @@ type Batch struct {
 }
 
 func init() {
-    functions.HTTP("ListBatches", listBatches)
+    functions.HTTP("GetBatch", getBatch)
 }
 
-func listBatches(w http.ResponseWriter, r *http.Request) {
+func getBatch(w http.ResponseWriter, r *http.Request) {
+    // this should be a POST request that has a JSON payload, we need to unmarshal the request body
+    decoder := json.NewDecoder(r.Body)
+    
+    var batchRequest BatchRequest
+    
+    decodeErr := decoder.Decode(&batchRequest)
+    
+    if decodeErr != nil {
+        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to decode request payload.  Error: " + decodeErr.Error() + "\"}")
+        os.Exit(1)
+    }
+
     ctx := context.Background()
     
     bigQueryClient, bigQueryClientErr := bigquery.NewClient(ctx, "beer-gravity-tracker")
@@ -32,7 +48,10 @@ func listBatches(w http.ResponseWriter, r *http.Request) {
         os.Exit(1)
     }
      
-    query := bigQueryClient.Query(`SELECT id, name, target_gravity FROM beer-gravity-tracker.data.batches ORDER BY name ASC`)
+    query := bigQueryClient.Query(`SELECT id, name, target_gravity FROM beer-gravity-tracker.data.batches WHERE id = @id`)
+    query.Parameters = []bigquery.QueryParameter{
+            {Name: "id", Value: batchRequest.Id},
+    }
     
     it, readErr := query.Read(ctx)
         
@@ -40,27 +59,17 @@ func listBatches(w http.ResponseWriter, r *http.Request) {
        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to read query.  Cannot continue. Error: " + readErr.Error() + "\"}")
        os.Exit(1)
     } 
+   
+    var batch Batch
     
-    batches := make([]Batch, 0)
+    itErr := it.Next(&batch)
     
-    for {
-        var batch Batch
-        
-        itErr := it.Next(&batch)
-        
-        if itErr == iterator.Done {
-            break
-        }
-        
-        if itErr != nil {
-            fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to get query output.  Cannot continue.  Error: " + itErr.Error() + "\"}")
-            os.Exit(1)
-        }
-        
-        batches = append(batches, batch)
+    if itErr != nil && itErr != iterator.Done {
+        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to get query output.  Cannot continue.  Error: " + itErr.Error() + "\"}")
+        os.Exit(1)
     }
     
-    jsonBytes, jsonErr := json.Marshal(batches)
+    jsonBytes, jsonErr := json.Marshal(batch)
     
     if jsonErr != nil {
         fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to convert output to json.  Cannot continue.  Error: " + jsonErr.Error() + "\"}")
