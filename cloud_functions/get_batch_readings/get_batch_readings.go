@@ -35,7 +35,7 @@ func getBatchReadings(w http.ResponseWriter, r *http.Request) {
     decodeErr := decoder.Decode(&batchRequest)
     
     if decodeErr != nil {
-        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to decode request payload.  Error: " + decodeErr.Error() + "\"}")
+        fmt.Fprint(w, "{\"success\":false, \"error\":\"Unable to decode request payload.  Error: " + decodeErr.Error() + "\"}")
         return
     }
     
@@ -44,7 +44,7 @@ func getBatchReadings(w http.ResponseWriter, r *http.Request) {
     bigQueryClient, bigQueryClientErr := bigquery.NewClient(ctx, "beer-gravity-tracker")
     
     if bigQueryClientErr != nil {
-        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to connect to datastore.  Cannot continue.  Error: " + bigQueryClientErr.Error() + "\"}")
+        fmt.Fprint(w, "{\"success\":false, \"error\":\"Unable to connect to datastore.  Cannot continue.  Error: " + bigQueryClientErr.Error() + "\"}")
         return
     }
     
@@ -58,7 +58,7 @@ func getBatchReadings(w http.ResponseWriter, r *http.Request) {
     it, readErr := query.Read(ctx)
         
     if readErr != nil {
-       fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to read query.  Cannot continue. Error: " + readErr.Error() + "\"}")
+       fmt.Fprint(w, "{\"success\":false, \"error\":\"Unable to read query.  Cannot continue. Error: " + readErr.Error() + "\"}")
        return
     }
     
@@ -74,7 +74,7 @@ func getBatchReadings(w http.ResponseWriter, r *http.Request) {
         }
         
         if itErr != nil {
-            fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to get query output.  Cannot continue.  Error: " + itErr.Error() + "\"}")
+            fmt.Fprint(w, "{\"success\":false, \"error\":\"Unable to get query output.  Cannot continue.  Error: " + itErr.Error() + "\"}")
             return
         }
         
@@ -84,9 +84,9 @@ func getBatchReadings(w http.ResponseWriter, r *http.Request) {
     jsonBytes, jsonErr := json.Marshal(batches)
     
     if jsonErr != nil {
-        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to convert output to json.  Cannot continue.  Error: " + jsonErr.Error() + "\"}")
+        fmt.Fprint(w, "{\"success\":false, \"error\":\"Unable to convert output to json.  Cannot continue.  Error: " + jsonErr.Error() + "\"}")
     } else {
-        fmt.Fprintln(w, string(jsonBytes))
+        fmt.Fprint(w, string(jsonBytes))
     }
     
     return

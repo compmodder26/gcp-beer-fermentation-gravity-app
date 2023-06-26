@@ -39,7 +39,7 @@ func newBatch(w http.ResponseWriter, r *http.Request) {
     decodeErr := decoder.Decode(&batchRequest)
     
     if decodeErr != nil {
-        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to decode request payload.  Error: " + decodeErr.Error() + "\"}")
+        fmt.Fprint(w, "{\"success\":false, \"error\":\"Unable to decode request payload.  Error: " + decodeErr.Error() + "\"}")
         return
     }
     
@@ -48,7 +48,7 @@ func newBatch(w http.ResponseWriter, r *http.Request) {
     bigQueryClient, bigQueryClientErr := bigquery.NewClient(ctx, "beer-gravity-tracker")
     
     if bigQueryClientErr != nil {
-        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to connect to datastore.  Error: " + bigQueryClientErr.Error() + "\"}")
+        fmt.Fprint(w, "{\"success\":false, \"error\":\"Unable to connect to datastore.  Error: " + bigQueryClientErr.Error() + "\"}")
         return
     }
     
@@ -59,7 +59,7 @@ func newBatch(w http.ResponseWriter, r *http.Request) {
     it, readErr := query.Read(ctx)
     
     if readErr != nil {
-       fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to read query.  Error: " + readErr.Error() + "\"}")
+       fmt.Fprint(w, "{\"success\":false, \"error\":\"Unable to read query.  Error: " + readErr.Error() + "\"}")
        return
     } 
     
@@ -68,7 +68,7 @@ func newBatch(w http.ResponseWriter, r *http.Request) {
     itErr := it.Next(&lastBatchId)
     
     if itErr != nil && itErr != iterator.Done {
-        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to get query output.  Error: " + itErr.Error() + "\"}")
+        fmt.Fprint(w, "{\"success\":false, \"error\":\"Unable to get query output.  Error: " + itErr.Error() + "\"}")
         return
     }
     
@@ -80,8 +80,8 @@ func newBatch(w http.ResponseWriter, r *http.Request) {
     }
     
     if insertErr := inserter.Put(ctx, items); insertErr != nil {
-        fmt.Fprintln(w, "{\"success\":false, \"error\":\"" + insertErr.Error() + "\"}")
+        fmt.Fprint(w, "{\"success\":false, \"error\":\"" + insertErr.Error() + "\"}")
     } else {
-        fmt.Fprintln(w, "{\"success\":true}")
+        fmt.Fprint(w, "{\"success\":true}")
     }
 }

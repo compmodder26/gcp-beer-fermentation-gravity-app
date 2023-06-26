@@ -28,7 +28,7 @@ func addBatchReading(w http.ResponseWriter, r *http.Request) {
     decodeErr := decoder.Decode(&batchRequest)
     
     if decodeErr != nil {
-        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to decode request payload.  Error: " + decodeErr.Error() + "\"}")
+        fmt.Fprint(w, "{\"success\":false, \"error\":\"Unable to decode request payload.  Error: " + decodeErr.Error() + "\"}")
         return
     }
     
@@ -37,7 +37,7 @@ func addBatchReading(w http.ResponseWriter, r *http.Request) {
     bigQueryClient, bigQueryClientErr := bigquery.NewClient(ctx, "beer-gravity-tracker")
     
     if bigQueryClientErr != nil {
-        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to connect to datastore.  Error: " + bigQueryClientErr.Error() + "\"}")
+        fmt.Fprint(w, "{\"success\":false, \"error\":\"Unable to connect to datastore.  Error: " + bigQueryClientErr.Error() + "\"}")
         return
     }
     
@@ -50,8 +50,8 @@ func addBatchReading(w http.ResponseWriter, r *http.Request) {
     }
     
     if _, insertErr := q.Read(ctx); insertErr != nil {
-        fmt.Fprintln(w, "{\"success\":false, \"error\":\"" + insertErr.Error() + "\"}")
+        fmt.Fprint(w, "{\"success\":false, \"error\":\"" + insertErr.Error() + "\"}")
     } else {
-        fmt.Fprintln(w, "{\"success\":true}")
+        fmt.Fprint(w, "{\"success\":true}")
     }
 }

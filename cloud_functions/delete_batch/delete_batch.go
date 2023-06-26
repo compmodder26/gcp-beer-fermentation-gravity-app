@@ -27,7 +27,7 @@ func deleteBatch(w http.ResponseWriter, r *http.Request) {
     decodeErr := decoder.Decode(&batchRequest)
     
     if decodeErr != nil {
-        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to decode request payload.  Error: " + decodeErr.Error() + "\"}")
+        fmt.Fprint(w, "{\"success\":false, \"error\":\"Unable to decode request payload.  Error: " + decodeErr.Error() + "\"}")
         return
     }
     
@@ -36,7 +36,7 @@ func deleteBatch(w http.ResponseWriter, r *http.Request) {
     bigQueryClient, bigQueryClientErr := bigquery.NewClient(ctx, "beer-gravity-tracker")
     
     if bigQueryClientErr != nil {
-        fmt.Fprintln(w, "{\"success\":false, \"error\":\"Unable to connect to datastore.  Error: " + bigQueryClientErr.Error() + "\"}")
+        fmt.Fprint(w, "{\"success\":false, \"error\":\"Unable to connect to datastore.  Error: " + bigQueryClientErr.Error() + "\"}")
         return
     }
     
@@ -48,7 +48,7 @@ func deleteBatch(w http.ResponseWriter, r *http.Request) {
     }
     
     if _, delReadingErr := delReadingQuery.Read(ctx); delReadingErr != nil {
-        fmt.Fprintln(w, "{\"success\":false, \"error\":\"" + delReadingErr.Error() + "\"}")
+        fmt.Fprint(w, "{\"success\":false, \"error\":\"" + delReadingErr.Error() + "\"}")
         return
     } 
     
@@ -58,8 +58,8 @@ func deleteBatch(w http.ResponseWriter, r *http.Request) {
     }
     
     if _, delBatchErr := delBatchQuery.Read(ctx); delBatchErr != nil {
-        fmt.Fprintln(w, "{\"success\":false, \"error\":\"" + delBatchErr.Error() + "\"}")
+        fmt.Fprint(w, "{\"success\":false, \"error\":\"" + delBatchErr.Error() + "\"}")
     } else {
-        fmt.Fprintln(w, "{\"success\":true}")
+        fmt.Fprint(w, "{\"success\":true}")
     }
 }
