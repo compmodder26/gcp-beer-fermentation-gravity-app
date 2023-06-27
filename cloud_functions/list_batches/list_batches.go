@@ -22,6 +22,8 @@ func init() {
 }
 
 func listBatches(w http.ResponseWriter, r *http.Request) {
+    w.Header().Add("Access-Control-Allow-Origin", "*")
+
     ctx := context.Background()
     
     bigQueryClient, bigQueryClientErr := bigquery.NewClient(ctx, "beer-gravity-tracker")
