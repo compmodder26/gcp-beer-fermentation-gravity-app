@@ -22,6 +22,12 @@ type BatchReading struct {
     Tstamp time.Time `json:"tstamp"`
 }
 
+type BatchReadingOutput struct {
+    Batch_id int `json:"batch_id"`
+    Reading float32 `json:"reading"`
+    Tstamp string `json:"tstamp"`
+}
+
 func init() {
     functions.HTTP("GetBatchReadings", getBatchReadings)
 }
@@ -66,7 +72,7 @@ func getBatchReadings(w http.ResponseWriter, r *http.Request) {
        return
     }
     
-    batches := make([]BatchReading, 0)
+    batches := make([]BatchReadingOutput, 0)
     
     for {
         var batch BatchReading
@@ -82,7 +88,13 @@ func getBatchReadings(w http.ResponseWriter, r *http.Request) {
             return
         }
         
-        batches = append(batches, batch)
+        batchOutput := BatchReadingOutput {
+            Batch_id: batch.Batch_id,
+            Reading: batch.Reading,
+            Tstamp: batch.Tstamp.Format("2006/01/02 15:04:05"),
+        }
+        
+        batches = append(batches, batchOutput)
     }
     
     jsonBytes, jsonErr := json.Marshal(batches)
