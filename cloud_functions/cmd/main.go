@@ -1,18 +1,18 @@
 package main
 
 import (
-    "log"
-    "os"
-    
-    // Blank-import the function packages so the init() runs
-	_ "github.com/compmodder26/gcp-beer-fermentation-gravity-app/cloud_functions/new_batch"
-	_ "github.com/compmodder26/gcp-beer-fermentation-gravity-app/cloud_functions/list_batches"
-	_ "github.com/compmodder26/gcp-beer-fermentation-gravity-app/cloud_functions/update_batch"
-	_ "github.com/compmodder26/gcp-beer-fermentation-gravity-app/cloud_functions/get_batch"
-	_ "github.com/compmodder26/gcp-beer-fermentation-gravity-app/cloud_functions/delete_batch"
-	_ "github.com/compmodder26/gcp-beer-fermentation-gravity-app/cloud_functions/add_batch_reading"
-	_ "github.com/compmodder26/gcp-beer-fermentation-gravity-app/cloud_functions/get_batch_readings"
+	"log"
+	"os"
+
+	// Blank-import the function packages so the init() runs
 	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
+	_ "github.com/compmodder26/gcp-beer-fermentation-gravity-app/cloud_functions/add_batch_reading"
+	_ "github.com/compmodder26/gcp-beer-fermentation-gravity-app/cloud_functions/delete_batch"
+	_ "github.com/compmodder26/gcp-beer-fermentation-gravity-app/cloud_functions/get_batch"
+	_ "github.com/compmodder26/gcp-beer-fermentation-gravity-app/cloud_functions/get_batch_readings"
+	_ "github.com/compmodder26/gcp-beer-fermentation-gravity-app/cloud_functions/list_batches"
+	_ "github.com/compmodder26/gcp-beer-fermentation-gravity-app/cloud_functions/new_batch"
+	_ "github.com/compmodder26/gcp-beer-fermentation-gravity-app/cloud_functions/update_batch"
 )
 
 func main() {
