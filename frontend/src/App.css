@@ -1,0 +1,40 @@
+body {
+    background-color: #b2b0b2;
+    padding: 100px;
+}
+
+.App {
+  text-align: center;
+}
+
+#addBatch {
+    display: absolute;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    width:48px;
+    height:48px;
+    cursor:pointer;
+}
+
+.optionButton {
+    width:32px;
+    height:32px;
+    float:left;
+    cursor:pointer;
+}
+
+.optionsEnd {
+    float:none;
+    clear:both;
+}
+
+.errorText {
+    color: #ff0000;
+}
+
+#gravityTargetReached {
+    font-weight: bold;
+    display:none;
+    color:#00FF00;
+}
