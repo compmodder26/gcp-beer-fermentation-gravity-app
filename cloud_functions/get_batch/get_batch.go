@@ -27,6 +27,7 @@ func init() {
 
 func getBatch(w http.ResponseWriter, r *http.Request) {
     w.Header().Add("Access-Control-Allow-Origin", "*")
+    w.Header().Add("Access-Control-Allow-Headers", "Content-Type")
 
     // this should be a POST request that has a JSON payload, we need to unmarshal the request body
     decoder := json.NewDecoder(r.Body)

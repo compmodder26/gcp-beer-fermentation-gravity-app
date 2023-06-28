@@ -23,6 +23,7 @@ func init() {
 
 func listBatches(w http.ResponseWriter, r *http.Request) {
     w.Header().Add("Access-Control-Allow-Origin", "*")
+    w.Header().Add("Access-Control-Allow-Headers", "Content-Type")
 
     ctx := context.Background()
     
