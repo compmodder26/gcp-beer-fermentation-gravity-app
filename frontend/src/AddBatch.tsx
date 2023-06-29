@@ -19,6 +19,10 @@ export default function AddBatch( props: any ) {
   const url = 'https://us-east1-beer-gravity-tracker.cloudfunctions.net/new_batch';
   
   const handleClickOpen = () => {
+    setBatchName('');
+    setTargetGravity('');
+    setOriginalGravity('');
+  
     setOpen(true);
   };
 

@@ -138,6 +138,9 @@ export function BatchReadingsChart ( props: any ) {
             props.setCurrentFermentationPct(
                 (((props.batchOriginalGravity - response.data[response.data.length - 1].reading) / (props.batchOriginalGravity - props.batchTargetGravity)) * 100).toFixed(2)
             );
+            props.setAttenuationPct(
+                (((props.batchOriginalGravity - response.data[response.data.length - 1].reading) / (props.batchOriginalGravity - 1.0)) * 100).toFixed(2)
+            );
         }
         
         setBatchReadings(response.data);

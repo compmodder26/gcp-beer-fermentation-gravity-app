@@ -37,6 +37,7 @@ export function EditDialog( props: any ) {
   const [currentGravity, setCurrentGravity] = React.useState('');
   const [currentABV, setCurrentABV] = React.useState('');
   const [fermentationPct, setCurrentFermentationPct] = React.useState('');
+  const [attenuationPct, setAttenuationPct] = React.useState('');
   
   React.useEffect(() => {
     subscribe("editBatchButtonClicked", function(event: any) {
@@ -56,6 +57,7 @@ export function EditDialog( props: any ) {
     setCurrentGravity('');
     setCurrentABV('');
     setCurrentFermentationPct('');
+    setAttenuationPct('');
   
     setOpen(true);
   };
@@ -178,6 +180,7 @@ export function EditDialog( props: any ) {
                     setCurrentGravity={setCurrentGravity}
                     setCurrentABV={setCurrentABV}
                     setCurrentFermentationPct={setCurrentFermentationPct}
+                    setAttenuationPct={setAttenuationPct}
                   />
               </div>
               <div id="batchReadingsSummaryContainer">
@@ -185,6 +188,7 @@ export function EditDialog( props: any ) {
                 <p><strong>Current Gravity:</strong> {currentGravity}</p>
                 <p><strong>Current ABV%:</strong> {currentABV}</p>
                 <p><strong>Fermentation Completion%:</strong> {fermentationPct}</p>
+                <p><strong>Apparent Attenuation%:</strong> {attenuationPct}</p>
               </div>
               <div className="optionsEnd"></div>
             </DialogContentText>
