@@ -12,9 +12,10 @@ import (
 )
 
 type Batch struct {
-	Id             int     `json:"id"`
-	Name           string  `json:"name"`
-	Target_gravity float32 `json:"target_gravity"`
+	Id               int     `json:"id"`
+	Name             string  `json:"name"`
+	Target_gravity   float32 `json:"target_gravity"`
+	Original_gravity float32 `json:"original_gravity"`
 }
 
 func init() {
@@ -34,7 +35,7 @@ func listBatches(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	query := bigQueryClient.Query(`SELECT id, name, target_gravity FROM beer-gravity-tracker.data.batches ORDER BY name ASC`)
+	query := bigQueryClient.Query(`SELECT id, name, target_gravity, original_gravity FROM beer-gravity-tracker.data.batches ORDER BY name ASC`)
 
 	it, readErr := query.Read(ctx)
 
