@@ -9,23 +9,20 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { DeleteButton } from './DeleteBatch';
 import { EditButton } from './EditBatch';
+import { subscribe, unsubscribe } from './events';
 
 
-class BatchListing extends React.Component<any> {
-  url = 'https://us-east1-beer-gravity-tracker.cloudfunctions.net/list_batches';
+export default function BatchListing ( props: any ) {
+  const url = 'https://us-east1-beer-gravity-tracker.cloudfunctions.net/list_batches';
   
-  state = {
-    rows: []
-  };
+  const initRowState: any[] = [];
   
-  constructor(props: any, context: any) {
-      super(props,context);
-  }
+  const [rows, setRows] = React.useState(initRowState);
 
-  fetchBatchListing() {
+  const fetchBatchListing = () => {
       axios({
         method: 'get',
-        url: this.url,
+        url: url,
         withCredentials: false,
       }).then((response) => {
         var newRows: any[] = [];
@@ -36,63 +33,51 @@ class BatchListing extends React.Component<any> {
             newRows.push(row);
         });
         
-        this.setState({
-            rows: newRows
-        });
+        setRows(newRows);
       });
   }
-
-  getInitialState() {
-    return {
-        rows: []
-    };
-  }
-
-  componentDidMount() {
-    this.fetchBatchListing();
-  }
   
-  componentDidUpdate(prevProps: any) {
-    if (this.props.didBeerListingChange) {
-        this.fetchBatchListing();
+  React.useEffect(() => {
+    subscribe("beerListChangedEvent", fetchBatchListing);
+    
+    fetchBatchListing();
+    
+    return () => {
+        unsubscribe("beerListChangedEvent", () => null);
     }
-  }
+  }, []);
 
-  render() {
-      return (
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Batch Name</TableCell>
-                <TableCell align="right">Original Gravity</TableCell>
-                <TableCell align="right">Target Gravity</TableCell>
-                <TableCell align="right">Options</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {this.state.rows.map((row: any) => (
-                <TableRow
-                  key={row.name}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {row.name}
-                  </TableCell>
-                  <TableCell align="right">{row.original_gravity}</TableCell>
-                  <TableCell align="right">{row.target_gravity}</TableCell>
-                  <TableCell align="right">
-                    <EditButton batchId={row.id} batchName={row.name} batchTargetGravity={row.target_gravity} batchOriginalGravity={row.original_gravity} />
-                    <DeleteButton batchId={row.id} batchName={row.name} />
-                    <div className="optionsEnd"> </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      );
-  }
+  return (
+    <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Batch Name</TableCell>
+            <TableCell align="right">Original Gravity</TableCell>
+            <TableCell align="right">Target Gravity</TableCell>
+            <TableCell align="right">Options</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row: any) => (
+            <TableRow
+              key={row.name}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                {row.name}
+              </TableCell>
+              <TableCell align="right">{row.original_gravity}</TableCell>
+              <TableCell align="right">{row.target_gravity}</TableCell>
+              <TableCell align="right">
+                <EditButton batchId={row.id} batchName={row.name} batchTargetGravity={row.target_gravity} batchOriginalGravity={row.original_gravity} />
+                <DeleteButton batchId={row.id} batchName={row.name} />
+                <div className="optionsEnd"> </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
 }
-
-export default BatchListing;

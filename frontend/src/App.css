@@ -38,3 +38,21 @@ body {
     display:none;
     color:#00FF00;
 }
+
+#batchReadingsChartContaner {
+    width:1000px;
+    float:left;
+}
+
+#batchReadingsSummaryContainer {
+    margin-left:40px;
+    min-width: 300px;
+    float:left;
+    height:350px;
+}
+
+.summaryHeading {
+    text-align:center;
+    margin-top:0px;
+    font-family: "Roboto","Helvetica","Arial",sans-serif;
+}

@@ -27,13 +27,16 @@ export function EditButton( props: any) {
 export function EditDialog( props: any ) {
   const getReadingUrl = 'https://us-east1-beer-gravity-tracker.cloudfunctions.net/get_batch_readings';
   const updateBatchUrl = 'https://us-east1-beer-gravity-tracker.cloudfunctions.net/update_batch';
-
+  
   const [open, setOpen] = React.useState(false);
   const [batchId, setBatchID] = React.useState(0);
   const [batchName, setBatchName] = React.useState('');
   const [batchTargetGravity, setBatchTargetGravity] = React.useState(0.0);
   const [batchOriginalGravity, setBatchOriginalGravity] = React.useState(0.0);
   const [errorText, setErrorText] = React.useState('');
+  const [currentGravity, setCurrentGravity] = React.useState('');
+  const [currentABV, setCurrentABV] = React.useState('');
+  const [fermentationPct, setCurrentFermentationPct] = React.useState('');
   
   React.useEffect(() => {
     subscribe("editBatchButtonClicked", function(event: any) {
@@ -50,6 +53,10 @@ export function EditDialog( props: any ) {
   }, []);
   
   const handleClickOpen = () => {
+    setCurrentGravity('');
+    setCurrentABV('');
+    setCurrentFermentationPct('');
+  
     setOpen(true);
   };
 
@@ -163,7 +170,23 @@ export function EditDialog( props: any ) {
               Current Gravity Readings <span id="gravityTargetReached">Target Gravity Reached!!</span>
             </DialogContentText>
             <DialogContentText>
-              <BatchReadingsChart batchId={batchId} batchTargetGravity={batchTargetGravity} batchOriginalGravity={batchOriginalGravity} />
+              <div id="batchReadingsChartContaner">
+                  <BatchReadingsChart 
+                    batchId={batchId} 
+                    batchTargetGravity={batchTargetGravity} 
+                    batchOriginalGravity={batchOriginalGravity} 
+                    setCurrentGravity={setCurrentGravity}
+                    setCurrentABV={setCurrentABV}
+                    setCurrentFermentationPct={setCurrentFermentationPct}
+                  />
+              </div>
+              <div id="batchReadingsSummaryContainer">
+                <h3 className="summaryHeading">Summary</h3>
+                <p><strong>Current Gravity:</strong> {currentGravity}</p>
+                <p><strong>Current ABV%:</strong> {currentABV}</p>
+                <p><strong>Fermentation Completion%:</strong> {fermentationPct}</p>
+              </div>
+              <div className="optionsEnd"></div>
             </DialogContentText>
             <DialogActions>
               <Button onClick={showBatchReadingDialog}>Add Reading</Button>

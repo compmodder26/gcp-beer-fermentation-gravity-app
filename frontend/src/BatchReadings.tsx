@@ -132,6 +132,12 @@ export function BatchReadingsChart ( props: any ) {
                 
                 response.data[i].abv_pct = abvCalc;
             }
+            
+            props.setCurrentGravity(response.data[response.data.length - 1].reading);
+            props.setCurrentABV(response.data[response.data.length - 1].abv_pct);
+            props.setCurrentFermentationPct(
+                (((props.batchOriginalGravity - response.data[response.data.length - 1].reading) / (props.batchOriginalGravity - props.batchTargetGravity)) * 100).toFixed(2)
+            );
         }
         
         setBatchReadings(response.data);
@@ -141,10 +147,11 @@ export function BatchReadingsChart ( props: any ) {
     return (
         <LineChart width={1000} height={400} data={batchReadings}>
           <Line type="monotone" dataKey="reading" stroke="#ff0000" />
-          <Line type="monotone" dataKey="abv_pct" stroke="#000000" />
+          <Line type="monotone" dataKey="abv_pct" stroke="#000000" yAxisId={1} />
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis dataKey="tstamp" includeHidden={true} />
-          <YAxis />
+          <YAxis yAxisId={0} label={{ value: 'Specific Gravity', angle: -90, position: 'insideLeft' }} scale="auto" />
+          <YAxis yAxisId={1} orientation="right" label={{ value: 'ABV %', angle: 90, position: 'insideRight' }} />
           <Tooltip />
           <Legend />
       </LineChart>
