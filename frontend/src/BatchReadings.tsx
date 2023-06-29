@@ -66,7 +66,7 @@ export function AddBatchReadingDialog ( props: any ) {
             Enter a specific gravity reading.
           </DialogContentText>
           <DialogContentText>
-            <span className="errorText">{errorText}.</span>
+            <span className="errorText">{errorText}</span>
           </DialogContentText>
           <TextField
             autoFocus
