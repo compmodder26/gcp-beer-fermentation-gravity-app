@@ -31,7 +31,7 @@ class BatchListing extends React.Component<any> {
         var newRows: any[] = [];
       
         response.data.forEach(function(batch: any) {
-            var row: any = {"name": batch.name, "target_gravity": batch.target_gravity, "id": batch.id};
+            var row: any = {"name": batch.name, "target_gravity": batch.target_gravity, "original_gravity": batch.original_gravity, "id": batch.id};
         
             newRows.push(row);
         });
@@ -65,6 +65,7 @@ class BatchListing extends React.Component<any> {
             <TableHead>
               <TableRow>
                 <TableCell>Batch Name</TableCell>
+                <TableCell align="right">Original Gravity</TableCell>
                 <TableCell align="right">Target Gravity</TableCell>
                 <TableCell align="right">Options</TableCell>
               </TableRow>
@@ -78,9 +79,10 @@ class BatchListing extends React.Component<any> {
                   <TableCell component="th" scope="row">
                     {row.name}
                   </TableCell>
+                  <TableCell align="right">{row.original_gravity}</TableCell>
                   <TableCell align="right">{row.target_gravity}</TableCell>
                   <TableCell align="right">
-                    <EditButton batchId={row.id} batchName={row.name} batchTargetGravity={row.target_gravity} />
+                    <EditButton batchId={row.id} batchName={row.name} batchTargetGravity={row.target_gravity} batchOriginalGravity={row.original_gravity} />
                     <DeleteButton batchId={row.id} batchName={row.name} />
                     <div className="optionsEnd"> </div>
                   </TableCell>

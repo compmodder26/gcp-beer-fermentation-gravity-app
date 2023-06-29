@@ -16,7 +16,7 @@ import { publish, subscribe, unsubscribe } from "./events";
 
 export function EditButton( props: any) {
     const handleEditButtonClick = () => {
-        publish('editBatchButtonClicked', { batchID: props.batchId, batchName: props.batchName, batchTargetGravity: props.batchTargetGravity });
+        publish('editBatchButtonClicked', { batchID: props.batchId, batchName: props.batchName, batchTargetGravity: props.batchTargetGravity, batchOriginalGravity: props.batchOriginalGravity });
     }
 
     return (
@@ -32,6 +32,7 @@ export function EditDialog( props: any ) {
   const [batchId, setBatchID] = React.useState(0);
   const [batchName, setBatchName] = React.useState('');
   const [batchTargetGravity, setBatchTargetGravity] = React.useState(0.0);
+  const [batchOriginalGravity, setBatchOriginalGravity] = React.useState(0.0);
   const [errorText, setErrorText] = React.useState('');
   
   React.useEffect(() => {
@@ -39,6 +40,7 @@ export function EditDialog( props: any ) {
         setBatchID(event.detail.batchID);
         setBatchName(event.detail.batchName);
         setBatchTargetGravity(event.detail.batchTargetGravity);
+        setBatchOriginalGravity(event.detail.batchOriginalGravity);
         handleClickOpen();
     });
     
@@ -69,6 +71,7 @@ export function EditDialog( props: any ) {
             id: batchId,
             name: batchName,
             target_gravity: batchTargetGravity,
+            original_gravity: batchOriginalGravity,
         },
         headers: {
             'Content-Type': 'application/json',
@@ -141,16 +144,26 @@ export function EditDialog( props: any ) {
             variant="standard"
             onChange={(newValue) => setBatchTargetGravity(parseFloat(newValue.target.value))} 
           />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="original_gravity"
+            name="original_gravity"
+            label="Original Gravity"
+            value={batchOriginalGravity}
+            type="number"
+            fullWidth
+            variant="standard"
+            onChange={(newValue) => setBatchOriginalGravity(parseFloat(newValue.target.value))} 
+          />
           <DialogActions>
               <Button onClick={editBatch}>Save</Button>
             </DialogActions>
-        </DialogContent>
-        <DialogContent>
             <DialogContentText>
               Current Gravity Readings <span id="gravityTargetReached">Target Gravity Reached!!</span>
             </DialogContentText>
             <DialogContentText>
-              <BatchReadingsChart batchId={batchId} batchTargetGravity={batchTargetGravity} />
+              <BatchReadingsChart batchId={batchId} batchTargetGravity={batchTargetGravity} batchOriginalGravity={batchOriginalGravity} />
             </DialogContentText>
             <DialogActions>
               <Button onClick={showBatchReadingDialog}>Add Reading</Button>

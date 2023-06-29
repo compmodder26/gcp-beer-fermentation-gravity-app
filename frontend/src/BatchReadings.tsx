@@ -8,7 +8,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { subscribe, unsubscribe, publish } from "./events";
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
 export function AddBatchReadingDialog ( props: any ) {
   const url = 'https://us-east1-beer-gravity-tracker.cloudfunctions.net/add_batch_reading';
@@ -113,32 +113,40 @@ export function BatchReadingsChart ( props: any ) {
             batch_id: props.batchId
         },
       }).then((response) => {
-        setBatchReadings(response.data);
-        
-        var gravityReachedAlertElem = document.getElementById("gravityTargetReached");
-        
-        if (gravityReachedAlertElem != null) {
-            gravityReachedAlertElem.style.display = 'none';
+        if (response.data.length > 0) {
+            var gravityReachedAlertElem = document.getElementById("gravityTargetReached");
             
-            if (response.data.length > 0) {
+            if (gravityReachedAlertElem != null) {
+                gravityReachedAlertElem.style.display = 'none';
+            
+            
                 var lastReading = response.data.at(-1);
                 
                 if (lastReading.reading <= props.batchTargetGravity) {
                     gravityReachedAlertElem.style.display = 'inline';
                 }
             }
+            
+            for (var i = 0; i < response.data.length; i++) {
+                var abvCalc: any = ((props.batchOriginalGravity - response.data[i].reading) * 131.25).toFixed(2);
+                
+                response.data[i].abv_pct = abvCalc;
+            }
         }
-       
+        
+        setBatchReadings(response.data);
       });
     };
     
     return (
         <LineChart width={1000} height={400} data={batchReadings}>
-          <Line type="monotone" dataKey="reading" stroke="#8884d8" />
+          <Line type="monotone" dataKey="reading" stroke="#ff0000" />
+          <Line type="monotone" dataKey="abv_pct" stroke="#000000" />
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis dataKey="tstamp" includeHidden={true} />
           <YAxis />
           <Tooltip />
+          <Legend />
       </LineChart>
     );
 }

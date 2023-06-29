@@ -14,6 +14,7 @@ export default function AddBatch( props: any ) {
   const [open, setOpen] = React.useState(false);
   const [batchName, setBatchName] = React.useState('');
   const [targetGravity, setTargetGravity] = React.useState('');
+  const [originalGravity, setOriginalGravity] = React.useState('');
   
   const url = 'https://us-east1-beer-gravity-tracker.cloudfunctions.net/new_batch';
   
@@ -33,6 +34,7 @@ export default function AddBatch( props: any ) {
         data: {
             name: batchName,
             target_gravity: parseFloat(targetGravity),
+            original_gravity: parseFloat(originalGravity),
         },
         headers: {
             'Content-Type': 'application/json',
@@ -78,6 +80,18 @@ export default function AddBatch( props: any ) {
             fullWidth
             variant="standard"
             onChange={(newValue) => setTargetGravity(newValue.target.value)} 
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="original_gravity"
+            name="original_gravity"
+            label="Original Gravity"
+            value={originalGravity}
+            type="number"
+            fullWidth
+            variant="standard"
+            onChange={(newValue) => setOriginalGravity(newValue.target.value)} 
           />
         </DialogContent>
         <DialogActions>
