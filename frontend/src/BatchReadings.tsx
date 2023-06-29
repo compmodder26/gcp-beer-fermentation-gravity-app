@@ -7,6 +7,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import spinner from './spinner.gif';
 import { subscribe, unsubscribe, publish } from "./events";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
@@ -16,6 +17,7 @@ export function AddBatchReadingDialog ( props: any ) {
   const [open, setOpen] = React.useState(false);
   const [reading, setReading] = React.useState('');
   const [errorText, setErrorText] = React.useState('');
+  const [ajaxRunning, setAjaxRunning] = React.useState(false);
   
   React.useEffect(() => {
       subscribe("addReadingButtonClicked", handleClickOpen);
@@ -36,6 +38,8 @@ export function AddBatchReadingDialog ( props: any ) {
   };
   
   const saveReading = () => {
+    setAjaxRunning(true);
+    
     axios({
         method: 'post',
         url: url,
@@ -54,6 +58,8 @@ export function AddBatchReadingDialog ( props: any ) {
         } else {
             setErrorText(response.data.error);
         }
+        
+        setAjaxRunning(false);
     });
   }
 
@@ -83,7 +89,11 @@ export function AddBatchReadingDialog ( props: any ) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={saveReading}>Submit</Button>
+          {ajaxRunning ? (
+            <img src={spinner} width="30" height="30" title="Processing" alt="Processing"/>
+          ) : (
+            <Button onClick={saveReading}>Submit</Button>
+          )}
         </DialogActions>
       </Dialog>
     </div>

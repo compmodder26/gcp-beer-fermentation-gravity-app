@@ -10,6 +10,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import editButton from './edit.png';
+import spinner from './spinner.gif';
 import { BatchReadingsChart, AddBatchReadingDialog } from './BatchReadings';
 import axios from 'axios';
 import { publish, subscribe, unsubscribe } from "./events";
@@ -38,6 +39,7 @@ export function EditDialog( props: any ) {
   const [currentABV, setCurrentABV] = React.useState('');
   const [fermentationPct, setCurrentFermentationPct] = React.useState('');
   const [attenuationPct, setAttenuationPct] = React.useState('');
+  const [ajaxRunning, setAjaxRunning] = React.useState(false);
   
   React.useEffect(() => {
     subscribe("editBatchButtonClicked", function(event: any) {
@@ -72,6 +74,7 @@ export function EditDialog( props: any ) {
   };
   
   const editBatch = () => {
+    setAjaxRunning(true);
     axios({
         method: 'post',
         url: updateBatchUrl,
@@ -92,6 +95,8 @@ export function EditDialog( props: any ) {
         } else {
             setErrorText(response.data.error);
         }
+        
+        setAjaxRunning(false);
     });
   }
   
@@ -166,7 +171,11 @@ export function EditDialog( props: any ) {
             onChange={(newValue) => setBatchOriginalGravity(parseFloat(newValue.target.value))} 
           />
           <DialogActions>
-              <Button onClick={editBatch}>Save</Button>
+              {ajaxRunning ? (
+                <img src={spinner} width="30" height="30" title="Processing" alt="Processing"/>
+              ) : (
+                <Button onClick={editBatch}>Save</Button>
+              )}
             </DialogActions>
             <DialogContentText>
               Current Gravity Readings <span id="gravityTargetReached">Target Gravity Reached!!</span>

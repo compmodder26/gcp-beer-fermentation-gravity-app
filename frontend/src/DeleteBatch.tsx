@@ -6,6 +6,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import deleteLogo from './agt_stop.png';
+import spinner from './spinner.gif';
 import axios from 'axios';
 import { publish, subscribe, unsubscribe } from "./events";
 
@@ -26,6 +27,7 @@ export function DeleteBatchDialog( props: any ) {
   const [batchId, setBatchID] = React.useState(0);
   const [batchName, setBatchName] = React.useState('');
   const [errorText, setErrorText] = React.useState('');
+  const [ajaxRunning, setAjaxRunning] = React.useState(false);
   
   React.useEffect(() => {
     subscribe("deleteBatchButtonClicked", function(event: any) {
@@ -49,6 +51,8 @@ export function DeleteBatchDialog( props: any ) {
   };
   
   const deleteBatch = () => {
+    setAjaxRunning(true);
+  
     axios({
         method: 'post',
         url: url,
@@ -66,6 +70,8 @@ export function DeleteBatchDialog( props: any ) {
         } else {
             setErrorText(response.data.error);
         }
+        
+        setAjaxRunning(false);
     });
   }
 
@@ -83,7 +89,11 @@ export function DeleteBatchDialog( props: any ) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={deleteBatch}>Delete</Button>
+          {ajaxRunning ? (
+            <img src={spinner} width="30" height="30" title="Processing" alt="Processing"/>
+          ) : (
+            <Button onClick={deleteBatch}>Delete</Button>
+          )}
         </DialogActions>
       </Dialog>
     </div>

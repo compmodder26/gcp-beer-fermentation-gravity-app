@@ -7,6 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import lists from './lists.png';
+import spinner from './spinner.gif';
 import axios from 'axios';
 import { publish } from "./events";
 
@@ -15,6 +16,7 @@ export default function AddBatch( props: any ) {
   const [batchName, setBatchName] = React.useState('');
   const [targetGravity, setTargetGravity] = React.useState('');
   const [originalGravity, setOriginalGravity] = React.useState('');
+  const [ajaxRunning, setAjaxRunning] = React.useState(false);
   
   const url = 'https://us-east1-beer-gravity-tracker.cloudfunctions.net/new_batch';
   
@@ -31,6 +33,7 @@ export default function AddBatch( props: any ) {
   };
   
   const addBatch = () => {
+    setAjaxRunning(true);
     axios({
         method: 'post',
         url: url,
@@ -44,6 +47,7 @@ export default function AddBatch( props: any ) {
             'Content-Type': 'application/json',
         },
       }).then((response) => {
+        setAjaxRunning(false);
         setBatchName('');
         setTargetGravity('');
         publish('beerListChangedEvent', "");
@@ -100,7 +104,11 @@ export default function AddBatch( props: any ) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={addBatch}>Save</Button>
+          {ajaxRunning ? (
+            <img src={spinner} width="30" height="30" title="Processing" alt="Processing"/>
+          ) : (
+            <Button onClick={addBatch}>Save</Button>
+          )}
         </DialogActions>
       </Dialog>
     </div>
