@@ -12,8 +12,9 @@ import (
 )
 
 type NewBatchRequest struct {
-	Name           string  `json:"name"`
-	Target_gravity float32 `json:"target_gravity"`
+	Name             string  `json:"name"`
+	Target_gravity   float32 `json:"target_gravity"`
+	Original_gravity float32 `json:"original_gravity"`
 }
 
 type LatestBatchId struct {
@@ -71,11 +72,12 @@ func newBatch(w http.ResponseWriter, r *http.Request) {
 
 	newBatchId := lastBatchId.Id + 1
 
-	q := bigQueryClient.Query("INSERT INTO beer-gravity-tracker.data.batches (id, name, target_gravity) VALUES(@batch_id, @name, @target_gravity)")
+	q := bigQueryClient.Query("INSERT INTO beer-gravity-tracker.data.batches (id, name, target_gravity, original_gravity) VALUES(@batch_id, @name, @target_gravity, @original_gravity)")
 	q.Parameters = []bigquery.QueryParameter{
 		{Name: "batch_id", Value: newBatchId},
 		{Name: "name", Value: batchRequest.Name},
 		{Name: "target_gravity", Value: batchRequest.Target_gravity},
+		{Name: "original_gravity", Value: batchRequest.Original_gravity},
 	}
 
 	if _, insertErr := q.Read(ctx); insertErr != nil {

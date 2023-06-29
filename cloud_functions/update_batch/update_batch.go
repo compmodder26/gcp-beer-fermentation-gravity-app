@@ -11,9 +11,10 @@ import (
 )
 
 type UpdateBatchRequest struct {
-	Id             int     `json:"id"`
-	Name           string  `json:"name"`
-	Target_gravity float32 `json:"target_gravity"`
+	Id               int     `json:"id"`
+	Name             string  `json:"name"`
+	Target_gravity   float32 `json:"target_gravity"`
+	Original_gravity float32 `json:"original_gravity"`
 }
 
 func init() {
@@ -47,10 +48,11 @@ func updateBatch(w http.ResponseWriter, r *http.Request) {
 
 	defer bigQueryClient.Close()
 
-	q := bigQueryClient.Query("UPDATE beer-gravity-tracker.data.batches SET name = @name, target_gravity = @target_gravity WHERE id = @id")
+	q := bigQueryClient.Query("UPDATE beer-gravity-tracker.data.batches SET name = @name, target_gravity = @target_gravity, original_gravity = @original_gravity WHERE id = @id")
 	q.Parameters = []bigquery.QueryParameter{
 		{Name: "name", Value: batchRequest.Name},
 		{Name: "target_gravity", Value: batchRequest.Target_gravity},
+		{Name: "original_gravity", Value: batchRequest.Original_gravity},
 		{Name: "id", Value: batchRequest.Id},
 	}
 
