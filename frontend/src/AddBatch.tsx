@@ -18,7 +18,7 @@ export default function AddBatch( props: any ) {
   const [originalGravity, setOriginalGravity] = React.useState('');
   const [ajaxRunning, setAjaxRunning] = React.useState(false);
   
-  const url = 'https://us-east1-beer-gravity-tracker.cloudfunctions.net/new_batch';
+  const url = process.env.REACT_APP_CLOUD_FUNCTIONS_URL + '/new_batch';
   
   const handleClickOpen = () => {
     setBatchName('');

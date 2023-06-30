@@ -21,7 +21,7 @@ export function DeleteButton( props: any) {
 }
 
 export function DeleteBatchDialog( props: any ) {
-  const url = 'https://us-east1-beer-gravity-tracker.cloudfunctions.net/delete_batch';
+  const url = process.env.REACT_APP_CLOUD_FUNCTIONS_URL + '/delete_batch';
 
   const [open, setOpen] = React.useState(false);
   const [batchId, setBatchID] = React.useState(0);

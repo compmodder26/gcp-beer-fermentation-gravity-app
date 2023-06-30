@@ -13,7 +13,7 @@ import { subscribe, unsubscribe } from './events';
 
 
 export default function BatchListing ( props: any ) {
-  const url = 'https://us-east1-beer-gravity-tracker.cloudfunctions.net/list_batches';
+  const url = process.env.REACT_APP_CLOUD_FUNCTIONS_URL + '/list_batches';
   
   const initRowState: any[] = [];
   

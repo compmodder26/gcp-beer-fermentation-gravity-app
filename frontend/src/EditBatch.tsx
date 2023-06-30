@@ -26,8 +26,8 @@ export function EditButton( props: any) {
 }
 
 export function EditDialog( props: any ) {
-  const getReadingUrl = 'https://us-east1-beer-gravity-tracker.cloudfunctions.net/get_batch_readings';
-  const updateBatchUrl = 'https://us-east1-beer-gravity-tracker.cloudfunctions.net/update_batch';
+  const getReadingUrl = process.env.REACT_APP_CLOUD_FUNCTIONS_URL + '/get_batch_readings';
+  const updateBatchUrl = process.env.REACT_APP_CLOUD_FUNCTIONS_URL + '/update_batch';
   
   const [open, setOpen] = React.useState(false);
   const [batchId, setBatchID] = React.useState(0);

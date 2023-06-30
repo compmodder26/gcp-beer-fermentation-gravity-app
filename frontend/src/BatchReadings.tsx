@@ -12,7 +12,7 @@ import { subscribe, unsubscribe, publish } from "./events";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
 export function AddBatchReadingDialog ( props: any ) {
-  const url = 'https://us-east1-beer-gravity-tracker.cloudfunctions.net/add_batch_reading';
+  const url = process.env.REACT_APP_CLOUD_FUNCTIONS_URL + '/add_batch_reading';
 
   const [open, setOpen] = React.useState(false);
   const [reading, setReading] = React.useState('');
