@@ -66,12 +66,7 @@ export function EditDialog( props: any ) {
     setCurrentABV('');
     setCurrentFermentationPct('');
     setAttenuationPct('');
-    setNameHasError(false);
-    setTargetGravityHasError(false);
-    setOriginalGravityHasError(false);
-    setNameHelpText("");
-    setTGHelpText("");
-    setOGHelpText("");
+    resetErrors();
   
     setOpen(true);
   };
@@ -85,8 +80,18 @@ export function EditDialog( props: any ) {
     publish("addReadingButtonClicked", "");
   };
   
+  const resetErrors = () => {
+    setNameHasError(false);
+    setTargetGravityHasError(false);
+    setOriginalGravityHasError(false);
+    setNameHelpText("");
+    setTGHelpText("");
+    setOGHelpText("");
+  }
+  
   const editBatch = () => {
     var allGood: boolean = true;
+    resetErrors();
     
     var targetFloatVal: number = parseFloat(batchTargetGravity);
     var originalFloatVal: number = parseFloat(batchOriginalGravity);
@@ -135,7 +140,13 @@ export function EditDialog( props: any ) {
             setAjaxRunning(false);
         });
     }
-  }
+  };
+  
+  const checkForReturnKey = (event: any) => {
+    if (event.charCode === 13) {
+        editBatch();
+    }
+  };
   
   function BootstrapDialogTitle(props: any) {
       const { children, onClose, ...other } = props;
@@ -184,6 +195,7 @@ export function EditDialog( props: any ) {
             variant="standard"
             onChange={(newValue) => setBatchName(newValue.target.value)} 
             helperText={nameHelpText}
+            onKeyPress={checkForReturnKey}
           />
           <TextField
             error={targetGravityHasError}
@@ -198,6 +210,7 @@ export function EditDialog( props: any ) {
             variant="standard"
             onChange={(newValue) => setBatchTargetGravity(newValue.target.value)} 
             helperText={tgHelpText}
+            onKeyPress={checkForReturnKey}
           />
           <TextField
             error={originalGravityHasError}
@@ -212,6 +225,7 @@ export function EditDialog( props: any ) {
             variant="standard"
             onChange={(newValue) => setBatchOriginalGravity(newValue.target.value)}
             helperText={ogHelpText} 
+            onKeyPress={checkForReturnKey}
           />
           <DialogActions>
               {ajaxRunning ? (

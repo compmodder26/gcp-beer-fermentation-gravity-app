@@ -31,8 +31,7 @@ export function AddBatchReadingDialog ( props: any ) {
   
   const handleClickOpen = () => {
     setReading('');
-    setReadingHasError(false);
-    setReadingHelpText('');
+    resetErrors();
     setOpen(true);
   };
 
@@ -41,8 +40,14 @@ export function AddBatchReadingDialog ( props: any ) {
     setOpen(false);
   };
   
+  const resetErrors = () => {
+    setReadingHasError(false);
+    setReadingHelpText('');
+  }
+  
   const saveReading = () => {
     var allGood: boolean = true;
+    resetErrors();
     
     var readingFloatVal: number = parseFloat(reading);
     
@@ -77,7 +82,13 @@ export function AddBatchReadingDialog ( props: any ) {
             setAjaxRunning(false);
         });
     }
-  }
+  };
+  
+  const checkForReturnKey = (event: any) => {
+    if (event.charCode === 13) {
+        saveReading();
+    }
+  };
 
   return (
     <div>
@@ -103,6 +114,7 @@ export function AddBatchReadingDialog ( props: any ) {
             variant="standard"
             onChange={(newValue) => setReading(newValue.target.value)} 
             helperText={readingHelpText}
+            onKeyPress={checkForReturnKey}
           />
         </DialogContent>
         <DialogActions>

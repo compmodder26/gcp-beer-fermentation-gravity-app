@@ -30,12 +30,7 @@ export default function AddBatch( props: any ) {
     setBatchName('');
     setTargetGravity('');
     setOriginalGravity('');
-    setNameHasError(false);
-    setTargetGravityHasError(false);
-    setOriginalGravityHasError(false);
-    setNameHelpText("");
-    setTGHelpText("");
-    setOGHelpText("");
+    resetErrors();
   
     setOpen(true);
   };
@@ -44,8 +39,18 @@ export default function AddBatch( props: any ) {
     setOpen(false);
   };
   
+  const resetErrors = () => {
+    setNameHasError(false);
+    setTargetGravityHasError(false);
+    setOriginalGravityHasError(false);
+    setNameHelpText("");
+    setTGHelpText("");
+    setOGHelpText("");
+  }
+  
   const addBatch = () => {
     var allGood: boolean = true;
+    resetErrors();
     
     var targetFloatVal: number = parseFloat(targetGravity);
     var originalFloatVal: number = parseFloat(originalGravity);
@@ -90,7 +95,13 @@ export default function AddBatch( props: any ) {
             handleClose();
         });
     }
-  }
+  };
+  
+  const checkForReturnKey = (event: any) => {
+    if (event.charCode === 13) {
+        addBatch();
+    }
+  };
 
   return (
     <div>
@@ -115,6 +126,7 @@ export default function AddBatch( props: any ) {
             variant="standard"
             onChange={(newValue) => setBatchName(newValue.target.value)} 
             helperText={nameHelpText}
+            onKeyPress={checkForReturnKey}
           />
           <TextField
             error={targetGravityHasError}
@@ -129,6 +141,7 @@ export default function AddBatch( props: any ) {
             variant="standard"
             onChange={(newValue) => setTargetGravity(newValue.target.value)} 
             helperText={tgHelpText}
+            onKeyPress={checkForReturnKey}
           />
           <TextField
             error={originalGravityHasError}
@@ -143,6 +156,7 @@ export default function AddBatch( props: any ) {
             variant="standard"
             onChange={(newValue) => setOriginalGravity(newValue.target.value)} 
             helperText={ogHelpText}
+            onKeyPress={checkForReturnKey}
           />
         </DialogContent>
         <DialogActions>
