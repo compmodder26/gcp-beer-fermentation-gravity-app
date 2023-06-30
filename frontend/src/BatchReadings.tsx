@@ -53,7 +53,7 @@ export function AddBatchReadingDialog ( props: any ) {
         },
       }).then((response) => {
         if (response.data.success) {
-            publish('batchReadingAdded', "");
+            publish('batchReadingAdded', { batchId: props.batchId });
             handleClose();
         } else {
             setErrorText(response.data.error);
@@ -105,7 +105,12 @@ export function BatchReadingsChart ( props: any ) {
     const [batchReadings, setBatchReadings] = React.useState([]);
     
     React.useEffect(() => {
-      subscribe("batchReadingAdded", getBatchReadings);
+      subscribe("batchReadingAdded", function ( event: any) {
+        // only need to refresh if the event batch id matches our batch id
+        if (event.detail.batchId == props.batchId) {
+            getBatchReadings();
+        }
+      });
       
       getBatchReadings();
     
