@@ -148,11 +148,11 @@ export function BatchReadingsChart ( props: any ) {
                 response.data[i].abv_pct = abvCalc;
             }
             
+            var fermentationPct: any = (((props.batchOriginalGravity - response.data[response.data.length - 1].reading) / (props.batchOriginalGravity - props.batchTargetGravity)) * 100).toFixed(2);
+            
             props.setCurrentGravity(response.data[response.data.length - 1].reading);
             props.setCurrentABV(response.data[response.data.length - 1].abv_pct);
-            props.setCurrentFermentationPct(
-                (((props.batchOriginalGravity - response.data[response.data.length - 1].reading) / (props.batchOriginalGravity - props.batchTargetGravity)) * 100).toFixed(2)
-            );
+            props.setCurrentFermentationPct(fermentationPct >= 100 ? 100.00.toFixed(2) : fermentationPct);
             props.setAttenuationPct(
                 (((props.batchOriginalGravity - response.data[response.data.length - 1].reading) / (props.batchOriginalGravity - 1.0)) * 100).toFixed(2)
             );
@@ -168,7 +168,7 @@ export function BatchReadingsChart ( props: any ) {
           <Line type="monotone" dataKey="abv_pct" stroke="#000000" yAxisId={1} />
           <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
           <XAxis dataKey="tstamp" includeHidden={true} />
-          <YAxis yAxisId={0} label={{ value: 'Specific Gravity', angle: -90, position: 'insideLeft' }} scale="auto" />
+          <YAxis yAxisId={0} domain={[1.000, props.batchOriginalGravity]} label={{ value: 'Specific Gravity', angle: -90, position: 'insideLeft' }} scale="auto" />
           <YAxis yAxisId={1} orientation="right" label={{ value: 'ABV %', angle: 90, position: 'insideRight' }} />
           <Tooltip />
           <Legend />
