@@ -18,6 +18,8 @@ export function AddBatchReadingDialog ( props: any ) {
   const [reading, setReading] = React.useState('');
   const [errorText, setErrorText] = React.useState('');
   const [ajaxRunning, setAjaxRunning] = React.useState(false);
+  const [readingHasError, setReadingHasError] = React.useState(false);
+  const [readingHelpText, setReadingHelpText] = React.useState("");
   
   React.useEffect(() => {
       subscribe("addReadingButtonClicked", handleClickOpen);
@@ -29,6 +31,8 @@ export function AddBatchReadingDialog ( props: any ) {
   
   const handleClickOpen = () => {
     setReading('');
+    setReadingHasError(false);
+    setReadingHelpText('');
     setOpen(true);
   };
 
@@ -38,29 +42,41 @@ export function AddBatchReadingDialog ( props: any ) {
   };
   
   const saveReading = () => {
-    setAjaxRunning(true);
+    var allGood: boolean = true;
     
-    axios({
-        method: 'post',
-        url: url,
-        withCredentials: false,
-        data: {
-            batch_id: props.batchId,
-            reading: parseFloat(reading),
-        },
-        headers: {
-            'Content-Type': 'application/json',
-        },
-      }).then((response) => {
-        if (response.data.success) {
-            publish('batchReadingAdded', { batchId: props.batchId });
-            handleClose();
-        } else {
-            setErrorText(response.data.error);
-        }
+    var readingFloatVal: number = parseFloat(reading);
+    
+    if (!(readingFloatVal >= 1.000 && readingFloatVal <= 1.1000)) {
+        setReadingHasError(true);
+        setReadingHelpText("Must be between 1.000 and 1.100");
+        allGood = false;
+    }
+  
+    if (allGood) {
+        setAjaxRunning(true);
         
-        setAjaxRunning(false);
-    });
+        axios({
+            method: 'post',
+            url: url,
+            withCredentials: false,
+            data: {
+                batch_id: props.batchId,
+                reading: readingFloatVal,
+            },
+            headers: {
+                'Content-Type': 'application/json',
+            },
+          }).then((response) => {
+            if (response.data.success) {
+                publish('batchReadingAdded', { batchId: props.batchId });
+                handleClose();
+            } else {
+                setErrorText(response.data.error);
+            }
+            
+            setAjaxRunning(false);
+        });
+    }
   }
 
   return (
@@ -75,6 +91,7 @@ export function AddBatchReadingDialog ( props: any ) {
             <span className="errorText">{errorText}</span>
           </DialogContentText>
           <TextField
+            error={readingHasError}
             autoFocus
             margin="dense"
             id="reading"
@@ -85,6 +102,7 @@ export function AddBatchReadingDialog ( props: any ) {
             fullWidth
             variant="standard"
             onChange={(newValue) => setReading(newValue.target.value)} 
+            helperText={readingHelpText}
           />
         </DialogContent>
         <DialogActions>

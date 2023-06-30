@@ -17,6 +17,12 @@ export default function AddBatch( props: any ) {
   const [targetGravity, setTargetGravity] = React.useState('');
   const [originalGravity, setOriginalGravity] = React.useState('');
   const [ajaxRunning, setAjaxRunning] = React.useState(false);
+  const [nameHasError, setNameHasError] = React.useState(false);
+  const [targetGravityHasError, setTargetGravityHasError] = React.useState(false);
+  const [originalGravityHasError, setOriginalGravityHasError] = React.useState(false);
+  const [nameHelpText, setNameHelpText] = React.useState("");
+  const [tgHelpText, setTGHelpText] = React.useState("");
+  const [ogHelpText, setOGHelpText] = React.useState("");
   
   const url = process.env.REACT_APP_CLOUD_FUNCTIONS_URL + '/new_batch';
   
@@ -24,6 +30,12 @@ export default function AddBatch( props: any ) {
     setBatchName('');
     setTargetGravity('');
     setOriginalGravity('');
+    setNameHasError(false);
+    setTargetGravityHasError(false);
+    setOriginalGravityHasError(false);
+    setNameHelpText("");
+    setTGHelpText("");
+    setOGHelpText("");
   
     setOpen(true);
   };
@@ -33,26 +45,51 @@ export default function AddBatch( props: any ) {
   };
   
   const addBatch = () => {
-    setAjaxRunning(true);
-    axios({
-        method: 'post',
-        url: url,
-        withCredentials: false,
-        data: {
-            name: batchName,
-            target_gravity: parseFloat(targetGravity),
-            original_gravity: parseFloat(originalGravity),
-        },
-        headers: {
-            'Content-Type': 'application/json',
-        },
-      }).then((response) => {
-        setAjaxRunning(false);
-        setBatchName('');
-        setTargetGravity('');
-        publish('beerListChangedEvent', "");
-        handleClose();
-    });
+    var allGood: boolean = true;
+    
+    var targetFloatVal: number = parseFloat(targetGravity);
+    var originalFloatVal: number = parseFloat(originalGravity);
+    
+    if (batchName == "") {
+        setNameHasError(true);
+        setNameHelpText("Cannot be empty");
+        allGood = false;
+    }
+    
+    if (!(targetFloatVal >= 1.000 && targetFloatVal <= 1.1000)) {
+        setTargetGravityHasError(true);
+        setTGHelpText("Must be between 1.000 and 1.100");
+        allGood = false;
+    }
+    
+    if (!(originalFloatVal >= 1.000 && originalFloatVal <= 1.1000)) {
+        setOriginalGravityHasError(true);
+        setOGHelpText("Must be between 1.000 and 1.100");
+        allGood = false;
+    }
+  
+    if (allGood) {
+        setAjaxRunning(true);
+        axios({
+            method: 'post',
+            url: url,
+            withCredentials: false,
+            data: {
+                name: batchName,
+                target_gravity: targetFloatVal,
+                original_gravity: originalFloatVal,
+            },
+            headers: {
+                'Content-Type': 'application/json',
+            },
+          }).then((response) => {
+            setAjaxRunning(false);
+            setBatchName('');
+            setTargetGravity('');
+            publish('beerListChangedEvent', "");
+            handleClose();
+        });
+    }
   }
 
   return (
@@ -66,6 +103,7 @@ export default function AddBatch( props: any ) {
           </DialogContentText>
           
           <TextField
+            error={nameHasError}
             autoFocus
             margin="dense"
             id="name"
@@ -76,8 +114,10 @@ export default function AddBatch( props: any ) {
             fullWidth
             variant="standard"
             onChange={(newValue) => setBatchName(newValue.target.value)} 
+            helperText={nameHelpText}
           />
           <TextField
+            error={targetGravityHasError}
             autoFocus
             margin="dense"
             id="target_gravity"
@@ -88,8 +128,10 @@ export default function AddBatch( props: any ) {
             fullWidth
             variant="standard"
             onChange={(newValue) => setTargetGravity(newValue.target.value)} 
+            helperText={tgHelpText}
           />
           <TextField
+            error={originalGravityHasError}
             autoFocus
             margin="dense"
             id="original_gravity"
@@ -100,6 +142,7 @@ export default function AddBatch( props: any ) {
             fullWidth
             variant="standard"
             onChange={(newValue) => setOriginalGravity(newValue.target.value)} 
+            helperText={ogHelpText}
           />
         </DialogContent>
         <DialogActions>

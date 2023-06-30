@@ -32,14 +32,20 @@ export function EditDialog( props: any ) {
   const [open, setOpen] = React.useState(false);
   const [batchId, setBatchID] = React.useState(0);
   const [batchName, setBatchName] = React.useState('');
-  const [batchTargetGravity, setBatchTargetGravity] = React.useState(0.0);
-  const [batchOriginalGravity, setBatchOriginalGravity] = React.useState(0.0);
+  const [batchTargetGravity, setBatchTargetGravity] = React.useState('');
+  const [batchOriginalGravity, setBatchOriginalGravity] = React.useState('');
   const [errorText, setErrorText] = React.useState('');
   const [currentGravity, setCurrentGravity] = React.useState('');
   const [currentABV, setCurrentABV] = React.useState('');
   const [fermentationPct, setCurrentFermentationPct] = React.useState('');
   const [attenuationPct, setAttenuationPct] = React.useState('');
   const [ajaxRunning, setAjaxRunning] = React.useState(false);
+  const [nameHasError, setNameHasError] = React.useState(false);
+  const [targetGravityHasError, setTargetGravityHasError] = React.useState(false);
+  const [originalGravityHasError, setOriginalGravityHasError] = React.useState(false);
+  const [nameHelpText, setNameHelpText] = React.useState("");
+  const [tgHelpText, setTGHelpText] = React.useState("");
+  const [ogHelpText, setOGHelpText] = React.useState("");
   
   React.useEffect(() => {
     subscribe("editBatchButtonClicked", function(event: any) {
@@ -60,6 +66,12 @@ export function EditDialog( props: any ) {
     setCurrentABV('');
     setCurrentFermentationPct('');
     setAttenuationPct('');
+    setNameHasError(false);
+    setTargetGravityHasError(false);
+    setOriginalGravityHasError(false);
+    setNameHelpText("");
+    setTGHelpText("");
+    setOGHelpText("");
   
     setOpen(true);
   };
@@ -74,30 +86,55 @@ export function EditDialog( props: any ) {
   };
   
   const editBatch = () => {
-    setAjaxRunning(true);
-    axios({
-        method: 'post',
-        url: updateBatchUrl,
-        withCredentials: false,
-        data: {
-            id: batchId,
-            name: batchName,
-            target_gravity: batchTargetGravity,
-            original_gravity: batchOriginalGravity,
-        },
-        headers: {
-            'Content-Type': 'application/json',
-        },
-      }).then((response) => {
-        if (response.data.success) {
-            publish('beerListChangedEvent', "");
-            handleClose();
-        } else {
-            setErrorText(response.data.error);
-        }
-        
-        setAjaxRunning(false);
-    });
+    var allGood: boolean = true;
+    
+    var targetFloatVal: number = parseFloat(batchTargetGravity);
+    var originalFloatVal: number = parseFloat(batchOriginalGravity);
+    
+    if (batchName == "") {
+        setNameHasError(true);
+        setNameHelpText("Cannot be empty");
+        allGood = false;
+    }
+    
+    if (!(targetFloatVal >= 1.000 && targetFloatVal <= 1.1000)) {
+        setTargetGravityHasError(true);
+        setTGHelpText("Must be between 1.000 and 1.100");
+        allGood = false;
+    }
+    
+    if (!(originalFloatVal >= 1.000 && originalFloatVal <= 1.1000)) {
+        setOriginalGravityHasError(true);
+        setOGHelpText("Must be between 1.000 and 1.100");
+        allGood = false;
+    }
+  
+    if (allGood) {
+        setAjaxRunning(true);
+        axios({
+            method: 'post',
+            url: updateBatchUrl,
+            withCredentials: false,
+            data: {
+                id: batchId,
+                name: batchName,
+                target_gravity: targetFloatVal,
+                original_gravity: originalFloatVal,
+            },
+            headers: {
+                'Content-Type': 'application/json',
+            },
+          }).then((response) => {
+            if (response.data.success) {
+                publish('beerListChangedEvent', "");
+                handleClose();
+            } else {
+                setErrorText(response.data.error);
+            }
+            
+            setAjaxRunning(false);
+        });
+    }
   }
   
   function BootstrapDialogTitle(props: any) {
@@ -135,6 +172,7 @@ export function EditDialog( props: any ) {
             <span className="errorText">{errorText}</span>
           </DialogContentText>
           <TextField
+            error={nameHasError}
             autoFocus
             margin="dense"
             id="name"
@@ -145,8 +183,10 @@ export function EditDialog( props: any ) {
             fullWidth
             variant="standard"
             onChange={(newValue) => setBatchName(newValue.target.value)} 
+            helperText={nameHelpText}
           />
           <TextField
+            error={targetGravityHasError}
             autoFocus
             margin="dense"
             id="target_gravity"
@@ -156,9 +196,11 @@ export function EditDialog( props: any ) {
             type="number"
             fullWidth
             variant="standard"
-            onChange={(newValue) => setBatchTargetGravity(parseFloat(newValue.target.value))} 
+            onChange={(newValue) => setBatchTargetGravity(newValue.target.value)} 
+            helperText={tgHelpText}
           />
           <TextField
+            error={originalGravityHasError}
             autoFocus
             margin="dense"
             id="original_gravity"
@@ -168,7 +210,8 @@ export function EditDialog( props: any ) {
             type="number"
             fullWidth
             variant="standard"
-            onChange={(newValue) => setBatchOriginalGravity(parseFloat(newValue.target.value))} 
+            onChange={(newValue) => setBatchOriginalGravity(newValue.target.value)}
+            helperText={ogHelpText} 
           />
           <DialogActions>
               {ajaxRunning ? (
