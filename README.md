@@ -4,3 +4,5 @@ A sample application to learn more about React and GCP.  This will track beer fe
 Backend functionality is hosted in GCP Cloud Functions.  Source is in Go.
 
 Frontend functionality is hosted in GCP App Engine.  Source is in React/Typscript.
+
+Data storage is in GCP Bigquery (overkill, I know.  But it has a free tier).
