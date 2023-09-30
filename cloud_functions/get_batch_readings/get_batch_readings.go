@@ -107,6 +107,4 @@ func getBatchReadings(w http.ResponseWriter, r *http.Request) {
 	} else {
 		fmt.Fprint(w, string(jsonBytes))
 	}
-
-	return
 }
