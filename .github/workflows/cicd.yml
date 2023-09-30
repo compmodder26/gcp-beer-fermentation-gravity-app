@@ -35,14 +35,128 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
-        #with:
-        #  go-version-file: cloud_functions/add_batch_reading/go.mod
+        with:
+          go-version-file: cloud_functions/add_batch_reading/go.mod
           
       - name: Golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
           version: "latest"
-          #working-directory: cloud_functions/add_batch_reading
+          working-directory: cloud_functions/add_batch_reading
+          # this format is used to also display the file & line number in the workflow's output
+          # without this, lint errors are only displayed in the "Files changed" tab
+          # see this issue for more information
+          # https://github.com/golangci/golangci-lint-action/issues/119
+          args: --timeout=5m --out-${NO_FUTURE}format colored-line-number
+
+  lint-delete_batch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: cloud_functions/delete_batch/go.mod
+          
+      - name: Golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: "latest"
+          working-directory: cloud_functions/delete_batch
+          # this format is used to also display the file & line number in the workflow's output
+          # without this, lint errors are only displayed in the "Files changed" tab
+          # see this issue for more information
+          # https://github.com/golangci/golangci-lint-action/issues/119
+          args: --timeout=5m --out-${NO_FUTURE}format colored-line-number
+
+  lint-get_batch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: cloud_functions/get_batch/go.mod
+          
+      - name: Golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: "latest"
+          working-directory: cloud_functions/get_batch
+          # this format is used to also display the file & line number in the workflow's output
+          # without this, lint errors are only displayed in the "Files changed" tab
+          # see this issue for more information
+          # https://github.com/golangci/golangci-lint-action/issues/119
+          args: --timeout=5m --out-${NO_FUTURE}format colored-line-number
+
+  lint-get_batch_readings:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: cloud_functions/get_batch_readings/go.mod
+          
+      - name: Golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: "latest"
+          working-directory: cloud_functions/get_batch_readings
+          # this format is used to also display the file & line number in the workflow's output
+          # without this, lint errors are only displayed in the "Files changed" tab
+          # see this issue for more information
+          # https://github.com/golangci/golangci-lint-action/issues/119
+          args: --timeout=5m --out-${NO_FUTURE}format colored-line-number
+
+  lint-list_batches:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: cloud_functions/new_batch/go.mod
+          
+      - name: Golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: "latest"
+          working-directory: cloud_functions/new_batch
+          # this format is used to also display the file & line number in the workflow's output
+          # without this, lint errors are only displayed in the "Files changed" tab
+          # see this issue for more information
+          # https://github.com/golangci/golangci-lint-action/issues/119
+          args: --timeout=5m --out-${NO_FUTURE}format colored-line-number
+
+  lint-new_batch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: cloud_functions/new_batch/go.mod
+          
+      - name: Golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: "latest"
+          working-directory: cloud_functions/new_batch
+          # this format is used to also display the file & line number in the workflow's output
+          # without this, lint errors are only displayed in the "Files changed" tab
+          # see this issue for more information
+          # https://github.com/golangci/golangci-lint-action/issues/119
+          args: --timeout=5m --out-${NO_FUTURE}format colored-line-number
+
+  lint-update_batch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: cloud_functions/update_batch/go.mod
+          
+      - name: Golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: "latest"
+          working-directory: cloud_functions/update_batch
           # this format is used to also display the file & line number in the workflow's output
           # without this, lint errors are only displayed in the "Files changed" tab
           # see this issue for more information
