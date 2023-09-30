@@ -179,3 +179,35 @@ jobs:
         with:
           eslint: true
           eslint_dir: frontend
+          
+  deploy:
+    needs: [ 
+        terraform-ci, 
+        lint-frontend, 
+        lint-update_batch, 
+        lint-new_batch, 
+        lint-list_batches, 
+        lint-get_batch_readings, 
+        lint-get_batch, 
+        lint-delete_batch, 
+        lint-add_batch_reading 
+      ]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "terraform"
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.2.0
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -no-color -input=false -var deployment_version=1 -out=tfplan
+        
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -input=false tfplan
