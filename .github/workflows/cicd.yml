@@ -174,4 +174,9 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
-      - run: npm test
+      - name: Run linters
+        uses: wearerequired/lint-action@v2
+        with:
+          eslint: true
+          prettier: true
+          eslint_dir: frontend
