@@ -20,4 +20,9 @@
 # Go workspace file
 go.work
 
+cloud_functions/*/archive
 frontend/node_modules
+frontend/app.zip
+frontend/build
+terraform/cloud_functions_sources
+terraform/.terraform

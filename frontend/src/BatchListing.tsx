@@ -26,6 +26,8 @@ export default function BatchListing ( props: any ) {
         withCredentials: false,
       }).then((response) => {
         var newRows: any[] = [];
+        
+        console.log(response);
       
         response.data.forEach(function(batch: any) {
             var row: any = {"name": batch.name, "target_gravity": batch.target_gravity, "original_gravity": batch.original_gravity, "id": batch.id};

@@ -131,7 +131,7 @@ export function AddBatchReadingDialog ( props: any ) {
 }
 
 export function BatchReadingsChart ( props: any ) {
-    const url = 'https://us-east1-beer-gravity-tracker.cloudfunctions.net/get_batch_readings';
+    const url = process.env.REACT_APP_CLOUD_FUNCTIONS_URL + '/get_batch_readings';
     const [batchReadings, setBatchReadings] = React.useState([]);
     
     React.useEffect(() => {

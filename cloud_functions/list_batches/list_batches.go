@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 
 	"cloud.google.com/go/bigquery"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -25,17 +26,20 @@ func init() {
 func listBatches(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Access-Control-Allow-Origin", "*")
 	w.Header().Add("Access-Control-Allow-Headers", "Content-Type")
+	
+	project := os.Getenv("GCP_PROJECT_ID")
+	dataset := os.Getenv("GCP_BIGQUERY_DATASET")
 
 	ctx := context.Background()
 
-	bigQueryClient, bigQueryClientErr := bigquery.NewClient(ctx, "beer-gravity-tracker")
+	bigQueryClient, bigQueryClientErr := bigquery.NewClient(ctx, project)
 
 	if bigQueryClientErr != nil {
 		fmt.Fprint(w, "{\"success\":false, \"error\":\"Unable to connect to datastore.  Cannot continue.  Error: "+bigQueryClientErr.Error()+"\"}")
 		return
 	}
 
-	query := bigQueryClient.Query(`SELECT id, name, target_gravity, original_gravity FROM beer-gravity-tracker.data.batches ORDER BY name ASC`)
+	query := bigQueryClient.Query(`SELECT id, name, target_gravity, original_gravity FROM `+project+`.`+dataset+`.batches ORDER BY name ASC`)
 
 	it, readErr := query.Read(ctx)
 
