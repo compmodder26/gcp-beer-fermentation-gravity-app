@@ -162,3 +162,16 @@ jobs:
           # see this issue for more information
           # https://github.com/golangci/golangci-lint-action/issues/119
           args: --timeout=5m --out-${NO_FUTURE}format colored-line-number
+          
+  lint-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm test
