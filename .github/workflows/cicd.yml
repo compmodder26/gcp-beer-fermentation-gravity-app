@@ -30,20 +30,19 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -no-color -input=false -var deployment_version=1
 
-  lint:
+  lint-add_batch_reading:
     runs-on: ubuntu-latest
-    defaults:
-        working-directory: "cloud_functions/add_batch_reading"
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version-file: go.mod
+          go-version-file: cloud_functions/add_batch_reading/go.mod
           
       - name: Golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
           version: "latest"
+          working-directory: cloud_functions/add_batch_reading
           # this format is used to also display the file & line number in the workflow's output
           # without this, lint errors are only displayed in the "Files changed" tab
           # see this issue for more information
