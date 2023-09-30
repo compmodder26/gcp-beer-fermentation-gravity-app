@@ -33,7 +33,6 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     defaults:
-      run:
         working-directory: "cloud_functions/add_batch_reading"
     steps:
       - uses: actions/checkout@v3
