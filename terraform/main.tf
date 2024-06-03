@@ -535,3 +535,45 @@ data "google_iam_policy" "cloud_function_run_policy" {
       delete_service_on_destroy = true
     }
 // End App Engine Definitions
+
+// Identity Platform
+/*  resource "google_project_service" "identitytoolkit" {
+    project = local.project
+    service = "identitytoolkit.googleapis.com"
+  }
+
+  resource "google_identity_platform_config" "default" {
+    project = local.project
+    autodelete_anonymous_users = true
+    sign_in {
+      allow_duplicate_emails = false
+
+      email {
+          enabled = true
+          password_required = true
+      }
+    }
+    blocking_functions {
+      triggers {
+        event_type = "beforeSignIn"
+        function_uri = "https://us-east1-my-project.cloudfunctions.net/before-sign-in"
+      }
+      forward_inbound_credentials {
+        refresh_token = true
+        access_token = true
+        id_token = true
+      }
+    }
+    quota {
+      sign_up_quota_config {
+        quota = 1000
+        start_time = ""
+        quota_duration = "7200s"
+      }
+    }
+    authorized_domains = [
+      "localhost",
+      "beer-fermentation-tracker.ue.r.appspot.com",
+    ]
+  }*/
+// End Identity Platgorm Definitions
