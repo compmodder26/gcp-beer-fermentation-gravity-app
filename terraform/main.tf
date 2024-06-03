@@ -500,7 +500,7 @@ data "google_iam_policy" "cloud_function_run_policy" {
     resource "google_app_engine_standard_app_version" "latest_version" {
       version_id = var.deployment_version
       service    = "default"
-      runtime    = "nodejs16"
+      runtime    = "nodejs22"
 
       entrypoint {
         shell = "npm start"
