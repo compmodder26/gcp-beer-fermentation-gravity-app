@@ -1,4 +1,4 @@
-runtime: nodejs16
+runtime: nodejs22
 instance_class: F4
 env_variables:
   REACT_APP_CLOUD_FUNCTIONS_URL: "https://us-east1-beer-fermentation-tracker.cloudfunctions.net"
