@@ -1,0 +1,79 @@
+type Query {
+  "Lists all batches"
+  listBatches: [Batch!]!
+  "Retrieves a specific batch"
+  batch(id: Int!): Batch
+}
+
+type Mutation {
+  "Adds a new batch"
+  newBatch(
+    input: BatchInput!
+  ): ModifyDataResponse!
+  "Adds a new gravity reading to a batch"
+  addBatchReading(
+    input: BatchReadingInput!
+  ): ModifyDataResponse!
+  "Updates a batch"
+  updateBatch(
+    input: BatchInput!
+  ): ModifyDataResponse!
+  "Deletes a batch"
+  deleteBatch(
+    id: Int!
+  ): ModifyDataResponse!
+}
+
+"A beer batch"
+type Batch {
+  "The ID for the batch."
+  id: Int!
+  "The name of the batch."
+  name: String!
+  "The batch's target gravity."
+  target_gravity: Float!
+  "The original gravity of the batch."
+  original_gravity: Float!
+  "The gravity readings of the batch."
+  readings: [Reading]
+}
+
+"A single gravity reading of a batch"
+type Reading {
+  "The ID of the batch the reading belongs to."
+  batch_id: Int!
+  "The gravity reading"
+  reading: Float!
+  "The timestamp of the reading."
+  tstamp: String
+}
+
+"The response of a data modification request"
+type ModifyDataResponse {
+  "The return code"
+  code: Int
+  "Whether or not the operation was successful"
+  success: Boolean!
+  "The error message given, if any"
+  error: String
+}
+
+"The input for adding a new batch"
+input BatchInput {
+  "The ID of the batch"
+  id: Int
+  "The name of the batch"
+  name: String!
+  "The target gravity"
+  target_gravity: Float!
+  "The original gravity"
+  original_gravity: Float!
+}
+
+"The input for adding a new reading to a batch"
+input BatchReadingInput {
+  "The id of the batch to add the reading for"
+  batch_id: Int!
+  "The new gravity reading"
+  reading: Float!
+}
