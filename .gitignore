@@ -27,4 +27,8 @@ frontend/build
 terraform/cloud_functions_sources
 terraform/.terraform
 
+backend/node_modules
+backend/app.zip
+backend/.env
+
 .tool-versions
