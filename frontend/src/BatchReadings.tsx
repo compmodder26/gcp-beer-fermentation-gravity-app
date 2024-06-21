@@ -1,5 +1,5 @@
 import * as React from 'react';
-import axios from 'axios';
+import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import TextField from '@mui/material/TextField';
@@ -10,6 +10,40 @@ import DialogTitle from '@mui/material/DialogTitle';
 import spinner from './spinner.gif';
 import { subscribe, unsubscribe, publish } from "./events";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+
+type BatchReading = {
+  reading: number;
+  tstamp: string;
+  abv_pct: number;
+}
+
+const GET_BATCH_READINGS = gql`
+  query GetBatch($batchId: Int!) {
+    batch(id: $batchId) {
+      readings {
+        reading
+        tstamp
+      }   
+    } 
+  }
+`;
+
+const ADD_BATCH_READING = gql`
+  mutation AddBatchReading($input: BatchReadingInput!) {
+    addBatchReading(input: $input) {
+      code
+      error
+      success
+    }
+  }
+`;
+
+const url = process.env.REACT_APP_GRAPHQL_API_URL;
+
+const gqlClient = new ApolloClient({
+  uri: url,
+  cache: new InMemoryCache(),
+});
 
 export function AddBatchReadingDialog ( props: any ) {
   const url = process.env.REACT_APP_CLOUD_FUNCTIONS_URL + '/add_batch_reading';
@@ -60,23 +94,28 @@ export function AddBatchReadingDialog ( props: any ) {
     if (allGood) {
         setAjaxRunning(true);
         
-        axios({
-            method: 'post',
-            url: url,
-            withCredentials: false,
-            data: {
-                batch_id: props.batchId,
-                reading: readingFloatVal,
+        gqlClient
+        .mutate({
+          mutation: ADD_BATCH_READING,
+          variables: {
+            "input": {
+              "batch_id": props.batchId,
+              "reading": readingFloatVal
             },
-            headers: {
-                'Content-Type': 'application/json',
-            },
-          }).then((response) => {
-            if (response.data.success) {
+          },
+          awaitRefetchQueries: true,
+          refetchQueries: [
+            { 
+              query: GET_BATCH_READINGS, 
+              variables: { "batchId": props.batchId }
+            } 
+          ],
+        }).then((response) => {
+            if (response.data.addBatchReading.success) {
                 publish('batchReadingAdded', { batchId: props.batchId });
                 handleClose();
             } else {
-                setErrorText(response.data.error);
+                setErrorText(response.data.addBatchReading.error);
             }
             
             setAjaxRunning(false);
@@ -131,8 +170,10 @@ export function AddBatchReadingDialog ( props: any ) {
 }
 
 export function BatchReadingsChart ( props: any ) {
+    const initialBatchReadingState: BatchReading[] = [];
+
     const url = process.env.REACT_APP_CLOUD_FUNCTIONS_URL + '/get_batch_readings';
-    const [batchReadings, setBatchReadings] = React.useState([]);
+    const [batchReadings, setBatchReadings] = React.useState(initialBatchReadingState);
     
     React.useEffect(() => {
       subscribe("batchReadingAdded", function ( event: any) {
@@ -150,45 +191,46 @@ export function BatchReadingsChart ( props: any ) {
     }, []);
     
     const getBatchReadings = () => {
-        axios({
-        method: 'post',
-        url: url,
-        withCredentials: false,
-        data: {
-            batch_id: props.batchId
-        },
+      gqlClient
+      .query({
+        query: GET_BATCH_READINGS,
+        variables: {
+          "batchId": props.batchId
+        }
       }).then((response) => {
-        if (response.data.length > 0) {
-            var gravityReachedAlertElem = document.getElementById("gravityTargetReached");
+        let readings: BatchReading[] = [];
+      
+        if (response.data.batch.readings.length > 0) {
+          var gravityReachedAlertElem = document.getElementById("gravityTargetReached");
+          
+          if (gravityReachedAlertElem != null) {
+            gravityReachedAlertElem.style.display = 'none';
+        
+        
+            var lastReading = response.data.batch.readings.at(-1);
             
-            if (gravityReachedAlertElem != null) {
-                gravityReachedAlertElem.style.display = 'none';
-            
-            
-                var lastReading = response.data.at(-1);
-                
-                if (lastReading.reading <= props.batchTargetGravity) {
-                    gravityReachedAlertElem.style.display = 'inline';
-                }
+            if (lastReading.reading <= props.batchTargetGravity) {
+                gravityReachedAlertElem.style.display = 'inline';
             }
+          }
+          
+          for (var i = 0; i < response.data.batch.readings.length; i++) {
+            var abvCalc: any = ((props.batchOriginalGravity - response.data.batch.readings[i].reading) * 131.25).toFixed(2);
             
-            for (var i = 0; i < response.data.length; i++) {
-                var abvCalc: any = ((props.batchOriginalGravity - response.data[i].reading) * 131.25).toFixed(2);
-                
-                response.data[i].abv_pct = abvCalc;
-            }
-            
-            var fermentationPct: any = (((props.batchOriginalGravity - response.data[response.data.length - 1].reading) / (props.batchOriginalGravity - props.batchTargetGravity)) * 100).toFixed(2);
-            
-            props.setCurrentGravity(response.data[response.data.length - 1].reading);
-            props.setCurrentABV(response.data[response.data.length - 1].abv_pct);
-            props.setCurrentFermentationPct(fermentationPct >= 100 ? 100.00.toFixed(2) : fermentationPct);
-            props.setAttenuationPct(
-                (((props.batchOriginalGravity - response.data[response.data.length - 1].reading) / (props.batchOriginalGravity - 1.0)) * 100).toFixed(2)
-            );
+            readings.push({ reading: response.data.batch.readings[i].reading, tstamp: response.data.batch.readings[i].tstamp, abv_pct: abvCalc});
+          }
+          
+          var fermentationPct: any = (((props.batchOriginalGravity - readings[readings.length - 1].reading) / (props.batchOriginalGravity - props.batchTargetGravity)) * 100).toFixed(2);
+          
+          props.setCurrentGravity(readings[response.data.batch.readings.length - 1].reading);
+          props.setCurrentABV(readings[response.data.batch.readings.length - 1].abv_pct);
+          props.setCurrentFermentationPct(fermentationPct >= 100 ? 100.00.toFixed(2) : fermentationPct);
+          props.setAttenuationPct(
+            (((props.batchOriginalGravity - readings[response.data.batch.readings.length - 1].reading) / (props.batchOriginalGravity - 1.0)) * 100).toFixed(2)
+          );
         }
         
-        setBatchReadings(response.data);
+        setBatchReadings(readings);
       });
     };
     

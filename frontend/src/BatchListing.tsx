@@ -1,5 +1,5 @@
 import * as React from 'react';
-import axios from 'axios';
+import { ApolloClient, InMemoryCache, ApolloProvider, gql, DefaultOptions } from '@apollo/client';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -13,23 +13,47 @@ import { subscribe, unsubscribe } from './events';
 
 
 export default function BatchListing ( props: any ) {
-  const url = process.env.REACT_APP_CLOUD_FUNCTIONS_URL + '/list_batches';
+  const url = process.env.REACT_APP_GRAPHQL_API_URL;
   
   const initRowState: any[] = [];
   
   const [rows, setRows] = React.useState(initRowState);
+  
+  const defaultOptions: DefaultOptions = {
+    watchQuery: {
+      fetchPolicy: 'no-cache',
+      errorPolicy: 'ignore',
+    },
+    query: {
+      fetchPolicy: 'no-cache',
+      errorPolicy: 'all',
+    },
+  }
+
+  const gqlClient = new ApolloClient({
+    uri: url,
+    cache: new InMemoryCache(),
+    defaultOptions: defaultOptions,
+  });
 
   const fetchBatchListing = () => {
-      axios({
-        method: 'get',
-        url: url,
-        withCredentials: false,
-      }).then((response) => {
+      gqlClient
+      .query({
+        query: gql`
+          query ListBatches {
+            listBatches {
+              id
+              name
+              target_gravity
+              original_gravity
+            }
+          }
+        `,
+      })
+      .then((response) => {
         var newRows: any[] = [];
-        
-        console.log(response);
       
-        response.data.forEach(function(batch: any) {
+        response.data.listBatches.forEach(function(batch: any) {
             var row: any = {"name": batch.name, "target_gravity": batch.target_gravity, "original_gravity": batch.original_gravity, "id": batch.id};
         
             newRows.push(row);

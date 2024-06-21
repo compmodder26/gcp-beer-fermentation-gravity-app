@@ -8,7 +8,25 @@ import DialogTitle from '@mui/material/DialogTitle';
 import deleteLogo from './agt_stop.png';
 import spinner from './spinner.gif';
 import axios from 'axios';
+import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
 import { publish, subscribe, unsubscribe } from "./events";
+
+const url = process.env.REACT_APP_GRAPHQL_API_URL;
+
+const gqlClient = new ApolloClient({
+  uri: url,
+  cache: new InMemoryCache(),
+});
+
+const DELETE_BATCH = gql`
+  mutation DeleteBatch($deleteBatchId: Int!) {
+    deleteBatch(id: $deleteBatchId) {
+      code
+      success
+      error
+    }
+  }
+`;
 
 export function DeleteButton( props: any) {
     const handleDeleteButtonClick = () => {
@@ -52,26 +70,24 @@ export function DeleteBatchDialog( props: any ) {
   
   const deleteBatch = () => {
     setAjaxRunning(true);
+    
+    console.log(batchId);
   
-    axios({
-        method: 'post',
-        url: url,
-        withCredentials: false,
-        data: {
-            id: batchId,
-        },
-        headers: {
-            'Content-Type': 'application/json',
-        },
-      }).then((response) => {
-        if (response.data.success) {
-            publish('beerListChangedEvent', "");
-            handleClose();
-        } else {
-            setErrorText(response.data.error);
-        }
-        
-        setAjaxRunning(false);
+    gqlClient
+    .mutate({
+      mutation: DELETE_BATCH,
+      variables: {
+        "deleteBatchId": batchId,
+      }
+    }).then((response) => {
+      if (response.data.deleteBatch.success) {
+          publish('beerListChangedEvent', "");
+          handleClose();
+      } else {
+          setErrorText(response.data.deleteBatch.error);
+      }
+      
+      setAjaxRunning(false);
     });
   }
 

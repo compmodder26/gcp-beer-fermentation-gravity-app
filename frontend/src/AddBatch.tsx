@@ -8,8 +8,25 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import lists from './lists.png';
 import spinner from './spinner.gif';
-import axios from 'axios';
+import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
 import { publish } from "./events";
+
+const url = process.env.REACT_APP_GRAPHQL_API_URL;
+
+const gqlClient = new ApolloClient({
+  uri: url,
+  cache: new InMemoryCache(),
+});
+
+const ADD_BATCH = gql`
+  mutation NewBatch($input: BatchInput!) {
+    newBatch(input: $input) {
+      code
+      error
+      success
+    }
+  }
+`;
 
 export default function AddBatch( props: any ) {
   const [open, setOpen] = React.useState(false);
@@ -23,8 +40,6 @@ export default function AddBatch( props: any ) {
   const [nameHelpText, setNameHelpText] = React.useState("");
   const [tgHelpText, setTGHelpText] = React.useState("");
   const [ogHelpText, setOGHelpText] = React.useState("");
-  
-  const url = process.env.REACT_APP_CLOUD_FUNCTIONS_URL + '/new_batch';
   
   const handleClickOpen = () => {
     setBatchName('');
@@ -75,19 +90,18 @@ export default function AddBatch( props: any ) {
   
     if (allGood) {
         setAjaxRunning(true);
-        axios({
-            method: 'post',
-            url: url,
-            withCredentials: false,
-            data: {
-                name: batchName,
-                target_gravity: targetFloatVal,
-                original_gravity: originalFloatVal,
+        
+        gqlClient
+        .mutate({
+          mutation: ADD_BATCH,
+          variables: {
+            "input": {
+              "name": batchName,
+              "target_gravity": targetFloatVal,
+              "original_gravity": originalFloatVal,
             },
-            headers: {
-                'Content-Type': 'application/json',
-            },
-          }).then((response) => {
+          }
+        }).then((response) => {
             setAjaxRunning(false);
             setBatchName('');
             setTargetGravity('');
