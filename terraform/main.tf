@@ -466,8 +466,21 @@ data "google_iam_policy" "cloud_function_run_policy" {
         enabled = true
       }
     }
+    
+    resource "google_storage_bucket" "app-backend" {
+      name          = "${local.project}-backend-${random_id.app-backend.hex}"
+      location      = local.location
+      force_destroy = true
+      versioning {
+        enabled = true
+      }
+    }
 
     resource "random_id" "app" {
+      byte_length = 8
+    }
+
+    resource "random_id" "app-backend" {
       byte_length = 8
     }
 
@@ -478,10 +491,23 @@ data "google_iam_policy" "cloud_function_run_policy" {
       excludes    = ["node_modules", "build", "app.yaml", ".gcloudignore", ".gitignore", ".env"]
     }
 
+    data "archive_file" "function_dist-backend" {
+      type        = "zip"
+      source_dir  = "../backend"
+      output_path = "../backend/app.zip"
+      excludes    = ["node_modules", "src", "build", "app.yaml", ".gcloudignore", ".gitignore", ".env", "codegen.ts"]
+    }
+
     resource "google_storage_bucket_object" "app" {
       name   = "app.${data.archive_file.function_dist.output_md5}.zip"
       source = data.archive_file.function_dist.output_path
       bucket = google_storage_bucket.app.name
+    }
+
+    resource "google_storage_bucket_object" "app-backend" {
+      name   = "app-backend.${data.archive_file.function_dist-backend.output_md5}.zip"
+      source = data.archive_file.function_dist-backend.output_path
+      bucket = google_storage_bucket.app-backend.name
     }
 
     resource "google_app_engine_application" "beer_fermentation_tracker" {
@@ -491,9 +517,17 @@ data "google_iam_policy" "cloud_function_run_policy" {
 
     resource "google_app_engine_application_url_dispatch_rules" "beer_fermentation_tracker" {
       dispatch_rules {
-        domain = "*"
+        domain = "beer-fermentation-tracker.ue.r.appspot.com"
         path = "/*"
         service = google_app_engine_standard_app_version.latest_version.service
+      }
+    }
+
+    resource "google_app_engine_application_url_dispatch_rules" "beer_fermentation_tracker-backend" {
+      dispatch_rules {
+        domain = "backend-dot-beer-fermentation-tracker.ue.r.appspot.com"
+        path = "/*"
+        service = google_app_engine_standard_app_version.backend.service
       }
     }
     
@@ -513,7 +547,46 @@ data "google_iam_policy" "cloud_function_run_policy" {
       }
       
       env_variables = {
-        REACT_APP_CLOUD_FUNCTIONS_URL = "https://${local.location}-${local.project}.cloudfunctions.net"
+        REACT_APP_GRAPHQL_API_URL = "https://backend-dot-beer-fermentation-tracker.ue.r.appspot.com"
+      }
+
+      instance_class = "F4"
+
+      automatic_scaling {
+        max_concurrent_requests = 10
+        min_idle_instances      = 1
+        max_idle_instances      = 3
+        min_pending_latency     = "1s"
+        max_pending_latency     = "5s"
+        standard_scheduler_settings {
+          target_cpu_utilization        = 0.5
+          target_throughput_utilization = 0.75
+          min_instances                 = 0
+          max_instances                 = 4
+        }
+      }
+      noop_on_destroy = true
+      delete_service_on_destroy = true
+    }
+    
+    resource "google_app_engine_standard_app_version" "backend" {
+      version_id = var.deployment_version
+      service    = "backend"
+      runtime    = "nodejs22"
+
+      entrypoint {
+        shell = "npm start"
+      }
+
+      deployment {
+        zip {
+          source_url = "https://storage.googleapis.com/${google_storage_bucket.app-backend.name}/${google_storage_bucket_object.app-backend.name}"
+        }
+      }
+      
+      env_variables = {
+        CLOUD_FUNCTIONS_URL = "https://${local.location}-${local.project}.cloudfunctions.net"
+        LISTEN_PORT = 80
       }
 
       instance_class = "F4"

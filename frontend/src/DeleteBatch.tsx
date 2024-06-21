@@ -7,7 +7,6 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import deleteLogo from './agt_stop.png';
 import spinner from './spinner.gif';
-import axios from 'axios';
 import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
 import { publish, subscribe, unsubscribe } from "./events";
 

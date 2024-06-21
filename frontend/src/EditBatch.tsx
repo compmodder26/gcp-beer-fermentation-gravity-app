@@ -12,8 +12,25 @@ import Typography from '@mui/material/Typography';
 import editButton from './edit.png';
 import spinner from './spinner.gif';
 import { BatchReadingsChart, AddBatchReadingDialog } from './BatchReadings';
-import axios from 'axios';
+import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client';
 import { publish, subscribe, unsubscribe } from "./events";
+
+const url = process.env.REACT_APP_GRAPHQL_API_URL;
+
+const gqlClient = new ApolloClient({
+  uri: url,
+  cache: new InMemoryCache(),
+});
+
+const UPDATE_BATCH = gql`
+  mutation UpdateBatch($input: BatchInput!) {
+    updateBatch(input: $input) {
+      code
+      success
+      error
+    }
+  }
+`;
 
 export function EditButton( props: any) {
     const handleEditButtonClick = () => {
@@ -116,25 +133,24 @@ export function EditDialog( props: any ) {
   
     if (allGood) {
         setAjaxRunning(true);
-        axios({
-            method: 'post',
-            url: updateBatchUrl,
-            withCredentials: false,
-            data: {
-                id: batchId,
-                name: batchName,
-                target_gravity: targetFloatVal,
-                original_gravity: originalFloatVal,
+        
+        gqlClient
+        .mutate({
+          mutation: UPDATE_BATCH,
+          variables: {
+            "input": {
+              "id": batchId,
+              "name": batchName,
+              "target_gravity": targetFloatVal,
+              "original_gravity": originalFloatVal,
             },
-            headers: {
-                'Content-Type': 'application/json',
-            },
-          }).then((response) => {
-            if (response.data.success) {
+          }
+        }).then((response) => {
+            if (response.data.updateBatch.success) {
                 publish('beerListChangedEvent', "");
                 handleClose();
             } else {
-                setErrorText(response.data.error);
+                setErrorText(response.data.updateBatch.error);
             }
             
             setAjaxRunning(false);

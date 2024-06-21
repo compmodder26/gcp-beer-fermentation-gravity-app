@@ -30,5 +30,6 @@ terraform/.terraform
 backend/node_modules
 backend/app.zip
 backend/.env
+backend/dist
 
 .tool-versions

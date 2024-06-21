@@ -14,9 +14,9 @@
     "node": ">=18.0"
   },
   "scripts": {
-    "compile": "tsc",
+    "compile": "tsc && cp ./src/schema.graphql ./dist/",
     "dev": "concurrently \"ts-node-dev --respawn --watch ./**/*.graphql ./src/index.ts\" \"npm run generate --watch\"",
-    "start": "npm run compile && nodemon ./dist/index.js",
+    "start": "node ./dist/index.js",
     "test": "jest",
     "generate": "graphql-codegen --watch \"src/schema.graphql\""
   },
