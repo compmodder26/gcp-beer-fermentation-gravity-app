@@ -30,8 +30,8 @@ async function startApolloServer() {
       };
     },
     listen: {
-      port: process.env.LISTEN_PORT ? parseInt(process.env.LISTEN_PORT) : 4000,
-      localAddress: process.env.LISTEN_ADDRESS ? process.env.LISTEN_ADDRESS : "localhost"
+      port: process.env.PORT ? parseInt(process.env.PORT) : 4000,
+      host: process.env.LISTEN_ADDRESS ? process.env.LISTEN_ADDRESS : "localhost"
     }
   });
   console.log(`

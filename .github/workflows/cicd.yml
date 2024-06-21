@@ -198,6 +198,16 @@ jobs:
         working-directory: "terraform"
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      
+      - name: Download Node Modules For Graph Backend
+        working-directory: backend
+        run: npm ci
+      
+      - name: Compile Static Graph Content
+        working-directory: backend
+        run: npm run compile
+      
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.2.0

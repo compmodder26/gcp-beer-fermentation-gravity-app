@@ -586,7 +586,7 @@ data "google_iam_policy" "cloud_function_run_policy" {
       
       env_variables = {
         CLOUD_FUNCTIONS_URL = "https://${local.location}-${local.project}.cloudfunctions.net"
-        LISTEN_PORT = 80
+        LISTEN_ADDRESS= "0.0.0.0"
       }
 
       instance_class = "F4"
